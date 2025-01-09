@@ -1,0 +1,22 @@
+{
+  "name": "tcc-pucrs",
+  "version": "1.0.0",
+  "description": "Projeto de TCC PUCRS",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/luizrsassi/tcc-pucrs.git"
+  },
+  "author": "Luiz Renato Sassi",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/luizrsassi/tcc-pucrs/issues"
+  },
+  "homepage": "https://github.com/luizrsassi/tcc-pucrs#readme",
+  "dependencies": {
+    "express": "^4.21.2"
+  }
+}
