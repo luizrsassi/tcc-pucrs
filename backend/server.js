@@ -2,6 +2,7 @@ import express from 'express';
 import dotenv from 'dotenv';
 import { connectDB } from './config/db.js';
 import userRoutes from "./routes/user.route.js";
+import clubRoutes from "./routes/club.route.js";
 import path from "path";
 import { fileURLToPath } from "url";
 
@@ -19,6 +20,7 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api/users", userRoutes);
+app.use("/api/clubs", clubRoutes);
 
 
 const PORT = process.env.PORT || 5000;

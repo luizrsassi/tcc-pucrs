@@ -6,7 +6,7 @@ import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const UPLOADS_PATH = path.join(__dirname, '../../uploads');
+const UPLOADS_PATH = path.join(__dirname, '../../uploads/users');
 
 export const register = async (req, res) => {
   try {
@@ -23,7 +23,7 @@ export const register = async (req, res) => {
       photo: req.file.filename
     });
 
-    const photoUrl = `${req.protocol}://${req.get("host")}/uploads/${user.photo}`;
+    const photoUrl = `${req.protocol}://${req.get("host")}/uploads/users/${user.photo}`;
     res.status(201).json({ ...user.toObject(), photo: photoUrl });
   } catch (error) {
     res.status(400).json({ error: error.message });
@@ -139,7 +139,7 @@ export const updateUser = async (req, res) => {
 
     if (req.file) {
       if (user.photo) {
-        const oldPhotoPath = path.join(__dirname, '../../uploads', user.photo);
+        const oldPhotoPath = path.join(__dirname, '../../uploads/users/', user.photo);
         fs.unlink(oldPhotoPath, (error) => {
           if (error) {
             console.error(`Erro ao deletar imagem: ${error.message}`);
@@ -164,7 +164,7 @@ export const updateUser = async (req, res) => {
       _id: updatedUser._id,
       name: updatedUser.name,
       email: updatedUser.email,
-      photo: `${process.env.BASE_URL}/uploads/${updatedUser.photo}`,
+      photo: `${process.env.BASE_URL}/uploads/users/${updatedUser.photo}`,
       isAdmin: updatedUser.isAdmin,
       memberClubs: updatedUser.memberClubs,
       adminClubs: updatedUser.adminClubs
