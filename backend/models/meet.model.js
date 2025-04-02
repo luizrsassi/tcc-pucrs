@@ -7,7 +7,6 @@ const messageSchema = new mongoose.Schema({
     required: [true, 'Usuário é obrigatório'],
     validate: {
       validator: async function(value) {
-        // Verifica se o usuário é membro do clube
         const meet = await mongoose.model('Meet').findOne({
           'discussions._id': this._id
         });
@@ -102,7 +101,6 @@ const meetSchema = new mongoose.Schema({
   toObject: { virtuals: true }
 });
 
-// meetSchema.index({ clubId: 1, datetime: -1 });
 meetSchema.index({ clubId: 1, 'discussions.timestamp': -1 });
 meetSchema.index({ book: 1 });
 

@@ -15,7 +15,6 @@ const ClubSchema = new Schema(
             type: String, 
             required: [true, 'A imagem de banner é obrigatória'],
             match: [/^https?:\/\/.*\.(jpe?g|png|gif|webp)$/i, 'URL de imagem inválida']
-            // match: [/^(http(s?):)([/|.|\w|\s|-])*\.(?:jpg|jpeg|gif|png)$/, 'URL de imagem inválida']
         },
         admin: {
             type: Schema.Types.ObjectId,
@@ -27,7 +26,7 @@ const ClubSchema = new Schema(
             ref: 'User',
             validate: {
                 validator: function(members) {
-                    return members.includes(this.admin); // Garante que o admin está nos membros
+                    return members.includes(this.admin);
                 },
                 message: 'O administrador deve estar na lista de membros'
             },

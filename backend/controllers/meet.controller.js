@@ -8,7 +8,6 @@ export const createMeet = async (req, res) => {
     try {
         session.startTransaction();
 
-        // Verificação de autenticação
         if (!req.user?._id) {
             return res.status(401).json({
                 success: false,
@@ -19,7 +18,6 @@ export const createMeet = async (req, res) => {
         const { clubId, bookId, title, description, datetime, location } = req.body;
         const adminId = req.user._id;
 
-        // Validação dos campos obrigatórios
         const requiredFields = ['clubId', 'bookId', 'title', 'description', 'datetime'];
         const missingFields = requiredFields.filter(field => !req.body[field]);
         
@@ -30,7 +28,6 @@ export const createMeet = async (req, res) => {
             });
         }
 
-        // Verifica se o clube existe e o usuário é admin
         const club = await Club.findById(clubId).session(session);
         if (!club) {
             return res.status(404).json({
@@ -46,7 +43,6 @@ export const createMeet = async (req, res) => {
             });
         }
 
-        // Verifica se o livro existe
         const bookExists = await Book.findById(bookId).session(session);
         if (!bookExists) {
             return res.status(404).json({
@@ -55,7 +51,6 @@ export const createMeet = async (req, res) => {
             });
         }
 
-        // Validação da data
         const meetDate = new Date(datetime);
         if (isNaN(meetDate.getTime()) || meetDate <= new Date()) {
             return res.status(400).json({
@@ -64,7 +59,6 @@ export const createMeet = async (req, res) => {
             });
         }
 
-        // Criação do meet
         const newMeet = new Meet({
             clubId,
             book: bookId,
@@ -79,7 +73,6 @@ export const createMeet = async (req, res) => {
             }
         });
 
-        // Validação do schema antes de salvar
         const validationError = newMeet.validateSync();
         if (validationError) {
             const errors = Object.values(validationError.errors).map(err => err.message);
@@ -92,7 +85,6 @@ export const createMeet = async (req, res) => {
 
         await newMeet.save({ session });
 
-        // Atualiza o clube com o novo meet
         await Club.findByIdAndUpdate(
             clubId,
             { $push: { meets: newMeet._id } },
@@ -101,7 +93,6 @@ export const createMeet = async (req, res) => {
 
         await session.commitTransaction();
 
-        // Popula os dados para a resposta
         const populatedMeet = await Meet.findById(newMeet._id)
             .populate('book', 'title author cover')
             .populate('createdBy', 'username profilePhoto');
@@ -116,7 +107,6 @@ export const createMeet = async (req, res) => {
         await session.abortTransaction();
         console.error('Erro ao criar encontro:', error);
 
-        // Tratamento específico para erros de banco de dados
         if (error.name === 'MongoServerError') {
             return res.status(500).json({
                 success: false,
