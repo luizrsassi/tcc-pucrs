@@ -4,36 +4,17 @@ const messageSchema = new mongoose.Schema({
   user: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
-    required: [true, 'Usuário é obrigatório'],
-    validate: {
-      validator: async function(value) {
-        const meet = await mongoose.model('Meet').findOne({
-          'discussions._id': this._id
-        });
-        const club = await mongoose.model('Club').findById(meet.clubId);
-        return club.members.includes(value);
-      },
-      message: 'Apenas membros do clube podem participar da discussão'
-    }
+    required: [true, 'Usuário é obrigatório']
   },
   text: {
     type: String,
     required: [true, 'Mensagem não pode estar vazia'],
     maxlength: [1000, 'Mensagem muito longa (máx. 1000 caracteres)']
   },
-  bookExcerpt: {
-    type: String,
-    maxlength: [500, 'Trecho muito longo (máx. 500 caracteres)']
-  },
-  pageNumber: Number,
   timestamp: {
     type: Date,
     default: Date.now
-  },
-  reactions: [{
-    type: String,
-    enum: ['like', 'concordo', 'discordo', 'importante']
-  }]
+  }
 });
 
 const meetSchema = new mongoose.Schema({
@@ -135,5 +116,6 @@ meetSchema.pre('save', async function(next) {
 });
 
 const Meet = mongoose.model('Meet', meetSchema);
+const Message = mongoose.model('Message', messageSchema);
 
 export default Meet;
