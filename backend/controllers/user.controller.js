@@ -1,4 +1,5 @@
 import User from "../models/user.model.js";
+import BlacklistedToken from '../models/blacklistedToken.model.js';
 import jwt from "jsonwebtoken";
 import fs from "fs";
 import path from "path";
@@ -47,6 +48,36 @@ export const login = async (req, res) => {
     res.json({ user, token });
   } catch (error) {
     res.status(401).json({ error: error.message });
+  }
+};
+
+export const logout = async (req, res) => {
+  try {
+      const token = req.headers.authorization?.split(' ')[1];
+      
+      if (token) {
+          try {
+              const decoded = jwt.verify(token, process.env.JWT_SECRET);
+              await BlacklistedToken.create({
+                  token,
+                  expiresAt: new Date(decoded.exp * 1000)
+              });
+          } catch (decodeError) {
+              // Token inválido não precisa ser processado
+          }
+      }
+
+      res.status(200).json({
+          success: true,
+          message: 'Logout realizado com sucesso'
+      });
+
+  } catch (error) {
+      console.error('Erro no logout:', error);
+      res.status(500).json({
+          success: false,
+          message: 'Erro durante o logout'
+      });
   }
 };
 
