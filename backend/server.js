@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 import { connectDB } from './config/db.js';
 import userRoutes from "./routes/user.route.js";
 import clubRoutes from "./routes/club.route.js";
+import meetingRoutes from "./routes/meet.route.js";
 import path from "path";
 import { fileURLToPath } from "url";
 
@@ -21,6 +22,7 @@ app.get("/", (req, res) => {
 
 app.use("/api/users", userRoutes);
 app.use("/api/clubs", clubRoutes);
+app.use("/api/meet", meetingRoutes);
 
 
 const PORT = process.env.PORT || 5000;

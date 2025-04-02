@@ -33,9 +33,9 @@ const ClubSchema = new Schema(
             },
             default: []
         },
-        meetings: {
+        meets: {
             type: [Schema.Types.ObjectId], 
-            ref: 'Meeting',
+            ref: 'Meet',
             default: []
         },
         description: {
