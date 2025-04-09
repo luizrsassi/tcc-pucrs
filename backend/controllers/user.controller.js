@@ -13,18 +13,18 @@ export const register = async (req, res) => {
   try {
     const { name, email, password } = req.body;
 
-    if (!req.file) {
-        return res.status(400).json({ error: "Foto de perfil obrigatória" });
-    }
-    
-    const user = await User.create({ 
+    const userData = { 
       name, 
       email, 
       password,
-      photo: req.file.filename
-    });
+      photo: req.file ? req.file.filename : null
+    };
 
-    const photoUrl = `${req.protocol}://${req.get("host")}/uploads/users/${user.photo}`;
+    const user = await User.create(userData);
+
+    const photoUrl = user.photo 
+      ? `${req.protocol}://${req.get("host")}/uploads/users/${user.photo}`
+      : null;
     res.status(201).json({ ...user.toObject(), photo: photoUrl });
   } catch (error) {
     res.status(400).json({ error: error.message });
