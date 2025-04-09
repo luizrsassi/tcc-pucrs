@@ -5,8 +5,14 @@ import CreatePage from './pages/CreatePage';
 import RegisterPage from './pages/RegisterPage';
 import LoginPage from './pages/LoginPage';
 import Navbar from './components/Navbar';
+import { userHandler } from './bookClub/user';
 
 function App() {
+  
+  const token = localStorage.getItem('token');
+  if (token) {
+    userHandler.setState({ token });
+  }
 
   return (
     <Box minH={"100vh"} bg={useColorModeValue("gray.100", "gray.900")}>

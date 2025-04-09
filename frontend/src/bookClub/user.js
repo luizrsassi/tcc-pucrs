@@ -48,5 +48,40 @@ export const userHandler = create((set) => ({
     } finally {
       set({ loading: false });
     }
-  }
+  },
+  loginUser: async (credentials) => {
+    try {
+      set({ loading: true, error: null });
+      
+      if (!credentials.email || !credentials.password) {
+        throw new Error("Preencha todos os campos");
+      }
+
+      const response = await fetch('http://localhost:5000/api/users/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(credentials),
+      });
+
+      const data = await response.json();
+      
+      if (!response.ok) throw new Error(data.error || 'Credenciais inválidas');
+
+      // Atualiza estado e armazena token
+      localStorage.setItem('token', data.token);
+      set({ 
+        user: data.user, 
+        token: data.token,
+        error: null 
+      });
+
+      return { success: true, message: "Login realizado com sucesso!" };
+
+    } catch (error) {
+      set({ error: error.message });
+      return { success: false, message: error.message };
+    } finally {
+      set({ loading: false });
+    }
+  },
 }));
