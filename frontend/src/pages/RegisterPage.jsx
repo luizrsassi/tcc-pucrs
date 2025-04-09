@@ -13,6 +13,7 @@ import {
     VStack 
 } from "@chakra-ui/react";
 import { useState, useEffect, useRef } from "react";
+import { userHandler } from "../bookClub/user";
 
 const RegisterPage = () => {
     const [showPassword, setShowPassword] = useState(false);
@@ -24,6 +25,7 @@ const RegisterPage = () => {
     });
     const toast = useToast();
     const prevPhotoRef = useRef(null);
+    const { registerUser } = userHandler();
 
     useEffect(() => {
         return () => {
@@ -33,65 +35,39 @@ const RegisterPage = () => {
         };
     }, []);
 
+
     const handleAddUser = async () => {
-        if (!newUser.name || !newUser.email || !newUser.password) {
-            toast({
-                title: "Erro",
-                description: "Preencha todos os campos obrigatórios",
-                status: "error",
-                isClosable: true,
-            });
-            return;
+        const result = await registerUser(newUser);
+    
+        if (result.success) {
+          toast({
+            title: "Sucesso",
+            description: result.message,
+            status: "success",
+            isClosable: true,
+          });
+          
+          setNewUser({
+            name: "",
+            email: "",
+            password: "",
+            photo: null
+          });
+          
+          if (prevPhotoRef.current) {
+            URL.revokeObjectURL(prevPhotoRef.current);
+            prevPhotoRef.current = null;
+          }
+          
+        } else {
+          toast({
+            title: "Erro",
+            description: result.message,
+            status: "error",
+            isClosable: true,
+          });
         }
-
-        try {
-            const formData = new FormData();
-            formData.append('name', newUser.name);
-            formData.append('email', newUser.email);
-            formData.append('password', newUser.password);
-            if (newUser.photo) {
-                formData.append('photo', newUser.photo);
-            }
-
-            console.log(formData);
-
-            const response = await fetch('http://localhost:5000/api/users/register', {
-                method: 'POST',
-                body: formData,
-            });
-
-            const result = await response.json();
-
-            if (!response.ok) {
-                throw new Error(result.error || 'Erro no registro');
-            }
-            toast({
-                title: "Sucesso",
-                description: "Usuário registrado com sucesso!",
-                status: "success",
-                isClosable: true,
-            });
-
-            setNewUser({
-                name: "",
-                email: "",
-                password: "",
-                photo: null
-            });
-            if (prevPhotoRef.current) {
-                URL.revokeObjectURL(prevPhotoRef.current);
-                prevPhotoRef.current = null;
-            }
-
-        } catch (error) {
-            toast({
-                title: "Erro",
-                description: error.message,
-                status: "error",
-                isClosable: true,
-            });
-        }
-    };
+      };
 
     const handlePhotoChange = (e) => {
         const file = e.target.files[0];
