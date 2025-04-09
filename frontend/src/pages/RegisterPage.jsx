@@ -12,6 +12,7 @@ import {
     useToast, 
     VStack 
 } from "@chakra-ui/react";
+import { Link } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
 import { userHandler } from "../bookClub/user";
 
@@ -165,6 +166,19 @@ const RegisterPage = () => {
                         <Button colorScheme='blue' onClick={handleAddUser} w='full'>
                             Criar Conta
                         </Button>
+                        <Text mt={4} textAlign="center">
+                            Já tem uma conta?{' '}
+                            <Link to="/login">
+                                <Text 
+                                as="span" 
+                                color="blue.500" 
+                                fontWeight="bold"
+                                _hover={{ textDecoration: 'underline' }}
+                                >
+                                Faça login aqui
+                                </Text>
+                            </Link>
+                        </Text>
                     </VStack>
                 </Box>
             </VStack>
