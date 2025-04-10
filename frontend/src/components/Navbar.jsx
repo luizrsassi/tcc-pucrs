@@ -1,44 +1,56 @@
-import { Container, Flex, Text, HStack, Button } from '@chakra-ui/react';
-import { Link } from 'react-router-dom'; // Import correto
-import { PlusSquareIcon } from "@chakra-ui/icons";
+import { Button, Container, Flex, HStack, Text } from "@chakra-ui/react";
+import { Link } from "react-router-dom";
+import { FiUser as PersonIcon, FiLogOut as ExitIcon } from 'react-icons/fi';
+import { userHandler } from "../store/userStore"
 
 const Navbar = () => {
-  return (
-    <Container maxW={"1140px"} px={4}>
-      <Flex
-        h={16}
-        alignItems={"center"}
-        justifyContent={"space-between"}
-        flexDir={{
-          base: "column",
-          sm: "row"
-        }}
-      >
-        {/* Link para a página inicial */}
-        <Link to="/">
-          <Text
-            fontSize={{ base: "22", sm: "28" }}
-            fontWeight={"bold"}
-            textTransform={"uppercase"}
-            textAlign={"center"}
-            bgGradient={"linear(to-r, cyan.400, blue.500)"}
-            bgClip={"text"}
-          >
-            Clube de ficção científica 📖
-          </Text>
-        </Link>
 
-        <HStack spacing={2} alignItems={"center"}>
-          {/* Link para a página de criação */}
-          <Link to="/create">
-            <Button>
-              <PlusSquareIcon fontSize={20} />
-            </Button>
-          </Link>
-        </HStack>
-      </Flex>
-    </Container>
-  );
+	return (
+		<Container maxW={"1140px"} px={4}>
+		<Flex
+			h={16}
+			alignItems={"center"}
+			justifyContent={"space-between"}
+			flexDir={{
+			base: "column",
+			sm: "row",
+			}}
+		>
+			<Text
+			fontSize={{ base: "22", sm: "28" }}
+			fontWeight={"bold"}
+			textTransform={"uppercase"}
+			textAlign={"center"}
+			bgGradient={"linear(to-r, cyan.400, blue.500)"}
+			bgClip={"text"}
+			>
+			<Link to={"/"}>Clube de Leitura</Link>
+			</Text>
+
+			<HStack spacing={2} alignItems={"center"}>
+			{/* Botão do Perfil */}
+			<Link to={"/profile"}>
+				<Button colorScheme="blue" variant="ghost">
+				<PersonIcon fontSize={20} mr={2} />
+				Perfil
+				</Button>
+			</Link>
+
+			{/* Botão de Logout */}
+			<Button 
+				colorScheme="red" 
+				variant="ghost"
+				onClick={async () => {
+					const { success } = await userHandler.getState().logoutUser();
+					if (success) window.location.href = '/login';
+				}}
+			>
+				<ExitIcon fontSize={20} mr={2} />
+				Sair
+			</Button>
+			</HStack>
+		</Flex>
+		</Container>
+	);
 };
-
 export default Navbar;

@@ -1,30 +1,36 @@
 import { Box, useColorModeValue } from '@chakra-ui/react';
-import { Route, Routes } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import HomePage from './pages/HomePage';
 import CreatePage from './pages/CreatePage';
 import RegisterPage from './pages/RegisterPage';
 import LoginPage from './pages/LoginPage';
-import Navbar from './components/Navbar';
-import { userHandler } from './bookClub/user';
+import ClubPage from './pages/ClubPage';
+import { userHandler } from './store/userStore';
+import { useEffect } from 'react';
 
 function App() {
-  
-  const token = localStorage.getItem('token');
-  if (token) {
-    userHandler.setState({ token });
-  }
 
-  return (
+useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+    userHandler.setState({ token });
+    }
+}, []);
+
+return (
     <Box minH={"100vh"} bg={useColorModeValue("gray.100", "gray.900")}>
-      <Navbar/>
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/create" element={<CreatePage />} />
-        <Route path="/register" element={<RegisterPage />} />
-        <Route path="/login" element={<LoginPage />} />
-      </Routes>
+        <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/register" element={<RegisterPage />} />
+            <Route path="/login" element={<LoginPage />} />
+            {/* <Route path="/profile" element={<ProfilePage />} /> */}
+            <Route path="/clubs" element={<ClubPage />} />
+            <Route path="/clubs/:clubId" element={<ClubPage />} />
+            <Route path="/create" element={<CreatePage />} />
+
+        </Routes>
     </Box>
-  );
+);
 }
 
 export default App;

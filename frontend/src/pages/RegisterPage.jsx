@@ -14,7 +14,7 @@ import {
 } from "@chakra-ui/react";
 import { Link } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
-import { userHandler } from "../bookClub/user";
+import { userHandler } from "../store/userStore";
 
 const RegisterPage = () => {
     const [showPassword, setShowPassword] = useState(false);
@@ -89,7 +89,7 @@ const RegisterPage = () => {
 
     return (
         <Container maxW={"container.sm"}>
-            <VStack spacing={8}>
+            <VStack spacing={8} pt={20}>
                 <Box w={"full"} p={6} rounded={"lg"} shadow={"md"}>
                     <VStack spacing={4}>
                         <Text fontSize="3xl" fontWeight="bold" bgGradient="linear(to-r, cyan.400, blue.500)" bgClip="text">

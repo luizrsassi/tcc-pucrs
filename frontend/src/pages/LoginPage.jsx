@@ -7,12 +7,13 @@ import {
   FormControl,
   FormLabel,
   Input,
+  Box,
   Button,
   InputGroup,
   InputRightElement,
   useToast
 } from '@chakra-ui/react';
-import { userHandler } from '../bookClub/user';
+import { userHandler } from '../store/userStore';
 
 const LoginPage = () => {
   const [email, setEmail] = useState('');
@@ -46,7 +47,8 @@ const LoginPage = () => {
 
   return (
     <Container maxW="container.sm" py={8}>
-      <VStack as="form" spacing={6} onSubmit={handleLogin}>
+      <VStack as="form" spacing={6} pt={40} onSubmit={handleLogin}>
+        <Box w={"full"} p={6} rounded={"lg"} shadow={"md"}>
         <Text fontSize="3xl" fontWeight="bold" bgGradient="linear(to-r, cyan.400, blue.500)" bgClip="text">
           Acesse sua conta
         </Text>
@@ -83,6 +85,7 @@ const LoginPage = () => {
         </FormControl>
 
         <Button
+          mt={4}
           type="submit"
           colorScheme="blue"
           width="full"
@@ -92,7 +95,7 @@ const LoginPage = () => {
           Entrar
         </Button>
 
-        <Text>
+        <Text align="center" mt={2}>
           Não tem uma conta?{' '}
           <Link to="/register">
             <Text as="span" color="blue.500" fontWeight="bold" _hover={{ textDecoration: 'underline' }}>
@@ -100,6 +103,7 @@ const LoginPage = () => {
             </Text>
           </Link>
         </Text>
+        </Box>
       </VStack>
     </Container>
   );
