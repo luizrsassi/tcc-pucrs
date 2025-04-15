@@ -1,7 +1,6 @@
 import { Box, useColorModeValue } from '@chakra-ui/react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import HomePage from './pages/HomePage';
-import CreatePage from './pages/CreatePage';
 import RegisterPage from './pages/RegisterPage';
 import LoginPage from './pages/LoginPage';
 import ClubPage from './pages/ClubPage';
@@ -26,8 +25,6 @@ return (
             {/* <Route path="/profile" element={<ProfilePage />} /> */}
             <Route path="/clubs" element={<ClubPage />} />
             <Route path="/clubs/:clubId" element={<ClubPage />} />
-            <Route path="/create" element={<CreatePage />} />
-
         </Routes>
     </Box>
 );
