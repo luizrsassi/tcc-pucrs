@@ -56,57 +56,57 @@ const totalPages = Math.ceil(filteredMeetings.length / itemsPerPage);
 
 return (
     <Box bg="#F5F5F5" minH="100vh">
-    <NavBar user={user} />
+        <NavBar user={user} />
 
-    <MainContainer />
+        <MainContainer />
 
-    <Container maxW="980px" py={8}>
+        <Container maxW="980px" py={8}>
 
-        <Box>
-            <SearchBar 
-                onSearch={setSearchTerm}
-                placeholder="Pesquisar encontros..."
-            />
-        </Box>
-
-        <Grid
-            templateColumns={{ 
-                base: '1fr', 
-                md: 'repeat(2, 1fr)', 
-                lg: 'repeat(3, 1fr)'
-            }}
-            gap={1}
-            columnGap={"1px"}
-            autoRows="minmax(280px, auto)"
-        >
-            {currentItems.map((meet) => (
-                <ClubMeetCard
-                    key={meet.id}
-                    image={meet.image}
-                    title={meet.title}
-                    author={meet.author}
-                    date={meet.date}
+            <Box>
+                <SearchBar 
+                    onSearch={setSearchTerm}
+                    placeholder="Pesquisar encontros..."
                 />
-            ))}
-        </Grid>
+            </Box>
 
-        <Flex justify="center" mt={8} gap={4}>
-            <Button
-                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                isDisabled={currentPage === 1}
+            <Grid
+                templateColumns={{ 
+                    base: '1fr', 
+                    md: 'repeat(2, 1fr)', 
+                    lg: 'repeat(3, 1fr)'
+                }}
+                gap={1}
+                columnGap={"1px"}
+                autoRows="minmax(280px, auto)"
             >
-                Anterior
-            </Button>
-            
-            <Button
-                onClick={() => setCurrentPage(prev => prev + 1)}
-                isDisabled={currentPage >= totalPages}
-            >
-                Próxima
-            </Button>
+                {currentItems.map((meet) => (
+                    <ClubMeetCard
+                        key={meet.id}
+                        image={meet.image}
+                        title={meet.title}
+                        author={meet.author}
+                        date={meet.date}
+                    />
+                ))}
+            </Grid>
 
-        </Flex>
-    </Container>
+            <Flex justify="center" mt={8} gap={4}>
+                <Button
+                    onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                    isDisabled={currentPage === 1}
+                >
+                    Anterior
+                </Button>
+                
+                <Button
+                    onClick={() => setCurrentPage(prev => prev + 1)}
+                    isDisabled={currentPage >= totalPages}
+                >
+                    Próxima
+                </Button>
+
+            </Flex>
+        </Container>
     </Box>
 );
 };
