@@ -275,7 +275,7 @@ export const updateClub = async (req, res) => {
 
 export const listClubs = async (req, res) => {
     try {
-        const { page = 1, limit = 10, search, sortBy = 'createdAt', sortOrder = 'desc' } = req.query;
+        const { page = 1, limit = 9, search, sortBy = 'createdAt', sortOrder = 'desc' } = req.query;
         const userId = req.user?._id;
 
         const filter = {};
