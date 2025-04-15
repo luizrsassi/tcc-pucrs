@@ -1,11 +1,22 @@
-import { Box, Container, Grid, Flex, Button, Spinner, Alert, AlertIcon, Heading, Text } from '@chakra-ui/react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate, Navigate } from 'react-router-dom';
-import { clubHandler } from '../store/clubStore';
+import {
+  Box,
+  Container,
+  Grid,
+  Flex,
+  Button,
+  Spinner,
+  Alert,
+  AlertIcon,
+  Heading,
+  Text
+} from '@chakra-ui/react';
 import ClubCard from '../components/ClubCard';
 import NavBar from '../components/Navbar';
-import mockClubs from '../utils/constants/mockClubs';
 import SearchBar from '../components/SearchBar';
+import { clubHandler } from '../store/clubStore';
+import { debounce } from 'lodash';
 
 const HomePage = () => {
     const navigate = useNavigate();
@@ -29,19 +40,34 @@ const HomePage = () => {
         }
     }, [navigate, token]);
 
+    // Carregamento inicial
+    useEffect(() => {
+        listClubs(1, '');
+    }, []);
+
+    // Debounce para pesquisa
+    const debouncedSearch = useRef(
+        debounce((searchValue) => {
+        clubHandler.setState({ currentPage: 1 });
+        listClubs(1, searchValue); 
+        }, 500)
+    ).current;
+
+    useEffect(() => {
+        debouncedSearch(searchTerm);
+        return () => debouncedSearch.cancel();
+    }, [searchTerm, debouncedSearch]);
+
+    // Atualizar lista quando página ou termo mudar
+    useEffect(() => {
+        listClubs(currentPage, searchTerm);
+    }, [currentPage, searchTerm]);
+
     // Redirecionamento se não estiver logado
     if (!token) {
         return <Navigate to="/login" replace />;
     }
 
-    // Filtra os clubes mockados (substitua por sua lógica real)
-    const filteredClubs = mockClubs.filter(club =>
-        club.name.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-
-    useEffect(() => {
-        listClubs(currentPage);
-    }, [currentPage]);
 
     return (
         <Box bg="gray.50" minH="100vh">
@@ -82,7 +108,7 @@ const HomePage = () => {
                     gap={6}
                     px={{ base: 4, md: 0 }}
                     >
-                        {filteredClubs.map((club) => (
+                        {clubs.map((club) => (
                             <ClubCard key={club._id} club={club} />
                         ))}
                     </Grid>

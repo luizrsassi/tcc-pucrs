@@ -79,9 +79,9 @@ export const clubHandler = create((set, get) => ({
       });
 
       set({ 
-        clubs: data.clubs,
-        currentPage: data.pagination.currentPage,
-        totalPages: data.pagination.totalPages
+        clubs: data.data.clubs,
+        currentPage: data.data.pagination.currentPage,
+        totalPages: data.data.pagination.totalPages
       });
 
       return { success: true, data: data.clubs };
