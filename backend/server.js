@@ -15,12 +15,33 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
+
 app.use(cors({
     origin: 'http://localhost:5173',
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    allowedHeaders: ['Content-Type', 'Authorization']
+    allowedHeaders: ['Content-Type', 'Authorization', 'Content-Range'],
+    exposedHeaders: ['Content-Range']
 }));
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+
+const staticOptions = {
+    index: false,
+    extensions: ['webp', 'jpg', 'png', 'jpeg'],
+    setHeaders: (res, filePath) => {
+        res.set("Cache-Control", "public, max-age=31536000");
+        if (filePath.endsWith(".webp")) res.type("image/webp");
+    }
+};
+
+app.use("/uploads/clubs", express.static(
+    path.join(__dirname, "..", "uploads", "clubs"),
+    staticOptions
+));
+
+app.use("/uploads/users", express.static(
+    path.join(__dirname, "..", "uploads", "users"),
+    staticOptions
+));
+
 app.use(express.json());
 
 app.get("/", (req, res) => {
