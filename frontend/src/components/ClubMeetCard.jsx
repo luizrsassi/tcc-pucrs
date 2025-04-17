@@ -1,75 +1,66 @@
 import React from 'react';
 import { 
-  Card, 
-  CardBody, 
-  Image, 
-  Stack, 
+  Box,
+  Badge,
+  Tag,
+  Flex,
   Text, 
   Heading 
 } from '@chakra-ui/react';
 
-const ClubMeetCard = ({ image, title, author, date }) => {
-  const [meetingNumber, bookTitle] = title.split(' - ');
+const ClubMeetCard = ({ 
+  title,
+  author,
+  date,
+  club,
+  location,
+  description,
+  status
+}) => {
+  const statusColors = {
+    agendado: 'blue',
+    realizado: 'green',
+    cancelado: 'red'
+  };
 
   return (
-    <Card maxW='305px' overflow='hidden' borderRadius={0} variant="unstyled" boxShadow="none" bg='transparent'>
-      <CardBody p={0} bg='transparent'>
-        <Image
-          src={image}
-          alt={`Capa do livro ${bookTitle}`}
-          w='305px'
-          h='184px'
-          objectFit='cover'
-          m={0}
-          borderRadius={0}
-        />
-        
-        <Stack spacing='2' pt={4} pr={4} pb={4} pl={0}>
-          <Text
-            fontFamily='Roboto'
-            fontWeight='bold'
-            fontSize='14px'
-            color='#1A141F'
-            lineHeight='144%'
-            textAlign='left'
-          >
-            {meetingNumber}
-          </Text>
-          
-          <Heading
-            fontFamily='Roboto'
-            fontWeight='bold'
-            fontSize='14px'
-            color='#1A141F'
-            lineHeight='144%'
-            textAlign='left'
-          >
-            {bookTitle}
-          </Heading>
-          
-          <Text
-            fontFamily='Roboto'
-            fontWeight='bold'
-            fontSize='14px'
-            color='#1A141F'
-            lineHeight='144%'
-            textAlign='left'
-          >
-            Autor: {author}
-          </Text>
-          
-          <Text
-            fontFamily='Roboto'
-            fontWeight='normal'
-            fontSize='12px'
-            color='#6B6B6B'
-            textAlign='left'
-          >
-            {date}
-          </Text>
-        </Stack>
-      </CardBody>
-    </Card>
+    <Box
+      borderWidth="1px"
+      borderRadius="lg"
+      overflow="hidden"
+      p={4}
+      bg="white"
+      boxShadow="md"
+      _hover={{ boxShadow: 'lg' }}
+    >
+      <Flex justify="space-between" align="center" mb={3}>
+        <Badge 
+          colorScheme={statusColors[status] || 'gray'} 
+          fontSize="0.8em"
+        >
+          {status?.toUpperCase()}
+        </Badge>
+        <Tag colorScheme="teal" fontSize="0.8em">{club}</Tag>
+      </Flex>
+
+      <Heading fontSize="xl" mb={2}>{title}</Heading>
+      
+      <Text fontSize="sm" color="gray.600" mb={2}>
+        {description}
+      </Text>
+
+      <Flex direction="column" gap={1} mt={3}>
+        <Text fontSize="sm">
+          <strong>Autor:</strong> {author}
+        </Text>
+        <Text fontSize="sm">
+          <strong>Data:</strong> {date}
+        </Text>
+        <Text fontSize="sm">
+          <strong>Local:</strong> {location}
+        </Text>
+      </Flex>
+    </Box>
   );
 };
 

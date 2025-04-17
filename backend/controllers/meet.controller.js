@@ -312,6 +312,52 @@ export const deleteMeet = async (req, res) => {
     }
 };
 
+export const getMeetById = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const meet = await Meet.findById(id)
+            .select('-discussions -pinnedMessages')
+            .populate([
+                { path: 'book', select: 'title author cover' },
+                { path: 'createdBy', select: 'username profilePhoto' },
+                { path: 'clubId', select: 'name' }
+            ])
+            .lean();
+
+        if (!meet) {
+            return res.status(404).json({
+                success: false,
+                message: 'Encontro não encontrado'
+            });
+        }
+
+        // Formatar dados
+        const formattedMeet = {
+            ...meet,
+            datetime: meet.datetime.toISOString(),
+            club: meet.clubId.name,
+            book: meet.book || { title: 'Livro removido' },
+            organizer: meet.createdBy
+        };
+
+        return res.status(200).json({
+            success: true,
+            data: formattedMeet,
+            message: 'Detalhes do encontro obtidos com sucesso'
+        });
+
+    } catch (error) {
+        console.error('Erro ao buscar encontro:', error);
+        return res.status(500).json({
+            success: false,
+            message: error.name === 'CastError' 
+                ? 'ID do encontro inválido' 
+                : 'Erro interno no servidor'
+        });
+    }
+};
+
 export const listMeets = async (req, res) => {
     try {
         const { 

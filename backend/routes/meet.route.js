@@ -1,12 +1,12 @@
 import express from "express";
-import { addMessageToMeet, createMeet, deleteMeet, deleteMessage, listMeets, pinMessage, unpinMessage, updateMeet } from "../controllers/meet.controller.js";
-import upload from "../middlewares/upload.js";
+import { addMessageToMeet, createMeet, deleteMeet, deleteMessage, getMeetById, listMeets, pinMessage, unpinMessage, updateMeet } from "../controllers/meet.controller.js";
 import authMiddleware from "../middlewares/auth.js";
 
 const router = express.Router();
 
 router.post("/create", authMiddleware, createMeet);
 router.get("/list", authMiddleware, listMeets);
+router.get("/:id", authMiddleware, getMeetById);
 router.put("/update/:meetId", authMiddleware, updateMeet);
 router.delete("/delete/:meetId", authMiddleware, deleteMeet);
 router.post("/:meetId/post", authMiddleware, addMessageToMeet);

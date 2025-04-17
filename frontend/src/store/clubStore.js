@@ -3,7 +3,7 @@ import { create } from "zustand";
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "http://localhost:5000/api/clubs", // Endpoint base para clubes
+  baseURL: "http://localhost:5000/api/clubs",
   headers: {
     "Content-Type": "application/json",
   },
@@ -92,6 +92,45 @@ export const clubHandler = create((set, get) => ({
       return { success: false, message };
     } finally {
       set({ loading: false });
+    }
+  },
+
+  // Nova função para reuniões de um clube específico
+  listClubMeets: async (clubId, page = 1, search = '', sortBy = 'datetime', sortOrder = 'asc') => {
+    try {
+      set({ loading: true, error: null });
+
+      const { data } = await api.get(`/${clubId}/meets`, {
+        params: {
+          page,
+          search,
+          sortBy,
+          sortOrder
+        }
+      });
+
+      set({ 
+        clubMeets: data.data.meets,
+        currentPage: data.data.pagination.currentPage,
+        totalPages: data.data.pagination.totalPages
+      });
+
+      return { 
+        success: true, 
+        data: data.data,
+        message: data.message 
+      };
+
+    } catch (error) {
+        const message = error.response?.data?.message || error.message;
+        set({ error: message });
+      return { 
+        success: false, 
+        message,
+        errorCode: error.response?.status 
+      };
+    } finally {
+        set({ loading: false });
     }
   },
 

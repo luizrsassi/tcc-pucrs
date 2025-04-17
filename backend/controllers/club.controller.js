@@ -1,6 +1,7 @@
 import Club from "../models/club.model.js";
 import User from "../models/user.model.js";
 import mongoose from 'mongoose';
+import Meet from '../models/meet.model.js';
 import fs from "fs";
 import path from "path";
 import { v4 as uuidv4 } from 'uuid';
@@ -342,6 +343,93 @@ export const listClubs = async (req, res) => {
 
     } catch (error) {
         console.error('Erro ao listar clubes:', error);
+        return res.status(500).json({
+            success: false,
+            message: 'Erro interno no servidor'
+        });
+    }
+};
+
+export const listClubMeets = async (req, res) => {
+    try {
+        const { 
+            page = 1, 
+            limit = 9, 
+            sortBy = 'datetime', 
+            sortOrder = 'asc',
+            status
+        } = req.query;
+
+        const { clubId } = req.params; // ID do clube vindo da URL
+
+        // Filtro fixo para o clube específico
+        const filter = { clubId }; 
+
+        // Filtros opcionais adicionais
+        if (status) filter.status = status;
+        if (req.query.search) {
+            filter.$or = [
+                { title: { $regex: req.query.search, $options: 'i' } },
+                { description: { $regex: req.query.search, $options: 'i' } }
+            ];
+        }
+
+        // Ordenação
+        const sort = {};
+        const validSortFields = ['datetime', 'createdAt', 'title'];
+        const sortField = validSortFields.includes(sortBy) ? sortBy : 'datetime';
+        sort[sortField] = sortOrder === 'desc' ? -1 : 1;
+
+        // Opções de consulta
+        const options = {
+            skip: (page - 1) * limit,
+            limit: parseInt(limit),
+            sort,
+            populate: [
+                { path: 'book', select: 'title author cover' },
+                { path: 'createdBy', select: 'username profilePhoto' },
+                { path: 'clubId', select: 'name' }
+            ]
+        };
+
+        // Consulta otimizada para um clube específico
+        const [meets, total] = await Promise.all([
+            Meet.find(filter)
+                .select('-discussions -pinnedMessages')
+                .populate(options.populate)
+                .skip(options.skip)
+                .limit(options.limit)
+                .sort(options.sort)
+                .lean(),
+            Meet.countDocuments(filter)
+        ]);
+
+        // Formatação dos resultados
+        const formattedMeets = meets.map(meet => ({
+            ...meet,
+            datetime: meet.datetime.toISOString(),
+            club: meet.clubId.name,
+            book: meet.book || { title: 'Livro removido' },
+            organizer: meet.createdBy
+        }));
+
+        // Resposta adaptada
+        return res.status(200).json({
+            success: true,
+            data: {
+                meets: formattedMeets,
+                pagination: {
+                    currentPage: parseInt(page),
+                    totalPages: Math.ceil(total / options.limit),
+                    totalMeets: total,
+                    resultsPerPage: options.limit
+                }
+            },
+            message: 'Reuniões do clube listadas com sucesso'
+        });
+
+    } catch (error) {
+        console.error('Erro ao listar reuniões do clube:', error);
         return res.status(500).json({
             success: false,
             message: 'Erro interno no servidor'
