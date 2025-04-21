@@ -203,7 +203,7 @@ deleteMessage: async (meetId, messageId) => {
     try {
     set({ loading: true, error: null });
     
-    await api.delete(`/${meetId}/messages/${messageId}`);
+    await api.delete(`/${meetId}/post/${messageId}`);
     
     set(state => ({
         currentMeet: {
