@@ -55,7 +55,7 @@ export const meetHandler = create((set, get) => ({
 
 getMeetById: async (meetId) => { // Recebe o ID como parâmetro
     try {
-      set({ loading: true, error: null, currentMeet: null });
+      set({ loading: true, error: null });
 
       const response = await api.get(`/${meetId}`); // Endpoint específico
 
@@ -63,7 +63,10 @@ getMeetById: async (meetId) => { // Recebe o ID como parâmetro
         throw new Error(response.data.message || "Meet não encontrado");
       }
 
-      set({ currentMeet: response.data.data });
+      set({ 
+        currentMeet: response.data.data,
+        error: null
+    });
 
       return { 
         success: true,

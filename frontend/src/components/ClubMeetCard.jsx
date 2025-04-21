@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { 
   Box,
   Badge,
@@ -15,7 +16,8 @@ const ClubMeetCard = ({
   club,
   location,
   description,
-  status
+  status,
+  to
 }) => {
   const statusColors = {
     agendado: 'blue',
@@ -25,13 +27,16 @@ const ClubMeetCard = ({
 
   return (
     <Box
+      as={Link}
+      to={to}
       borderWidth="1px"
       borderRadius="lg"
       overflow="hidden"
       p={4}
       bg="white"
       boxShadow="md"
-      _hover={{ boxShadow: 'lg' }}
+      _hover={{ boxShadow: 'lg', textDecoration: 'none' }}
+      style={{ textDecoration: 'none' }}
     >
       <Flex justify="space-between" align="center" mb={3}>
         <Badge 

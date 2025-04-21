@@ -4,6 +4,7 @@ import HomePage from './pages/HomePage';
 import RegisterPage from './pages/RegisterPage';
 import LoginPage from './pages/LoginPage';
 import ClubPage from './pages/ClubPage';
+import MeetPage from './pages/MeetPage';
 import { userHandler } from './store/userStore';
 import { useEffect } from 'react';
 
@@ -25,6 +26,7 @@ return (
             {/* <Route path="/profile" element={<ProfilePage />} /> */}
             <Route path="/clubs" element={<ClubPage />} />
             <Route path="/clubs/:clubId" element={<ClubPage />} />
+            <Route path="/meets/:meetId" element={<MeetPage />} />
         </Routes>
     </Box>
 );
