@@ -10,20 +10,27 @@ import {
     Text,
     Alert,
     AlertIcon,
-    Spinner
+    Spinner,
+    useToast
   } from '@chakra-ui/react';
   import { useState, useEffect } from 'react';
   import { meetHandler } from '../store/meetStore';
+  import { userHandler } from '../store/userStore';
   
   const CommentSection = ({ meetId }) => {
     const [comment, setComment] = useState('');
+    const [deletingId, setDeletingId] = useState(null);
+    const { user } = userHandler();
+
+    const toast = useToast();
     
     const { 
         currentMeet, 
         loadingMessages,
         error,
         getMeetMessages,
-        addMessage
+        addMessage,
+        deleteMessage
     } = meetHandler();
 
     useEffect(() => {
@@ -42,6 +49,51 @@ import {
             console.error('Erro ao enviar mensagem:', err);
         }
     };
+
+    // Nova função para deletar mensagem
+    // const handleDelete = async (messageId) => {
+    //   try {
+    //       setDeletingId(messageId);
+    //       await deleteMessage(meetId, messageId);
+    //       // Atualiza a lista após exclusão
+    //       await getMeetMessages(meetId);
+    //   } catch (err) {
+    //       console.error('Erro ao excluir mensagem:', err);
+    //   } finally {
+    //     setDeletingId(null);
+    //     await getMeetMessages(meetId);
+    //   }
+    // };
+    const handleDelete = async (messageId) => {
+      try {
+          setDeletingId(messageId);
+          await deleteMessage(meetId, messageId);
+          
+          toast({
+              title: 'Mensagem excluída!',
+              status: 'success',
+              duration: 3000,
+              isClosable: true,
+          });
+      } catch (err) {
+          toast({
+              title: 'Erro ao excluir',
+              description: err.message,
+              status: 'error',
+              duration: 5000,
+              isClosable: true,
+          });
+      } finally {
+          setDeletingId(null);
+      }
+    };
+
+        // Adicione esta verificação de debug
+      //   console.log('Usuário logado:', {
+      //     id: user?._id,
+      //     name: user?.name,
+      //     isAuthenticated: !!user
+      // });
   
     return (
     <Box mt={8} p={4} bg="gray.50" borderRadius="lg">
@@ -82,10 +134,34 @@ import {
         {/* Lista de mensagens */}
         <VStack spacing={4} align="stretch">
             {currentMeet?.messages?.map((msg) => (
-                <Flex key={msg._id} p={4} bg="white" borderRadius="md" boxShadow="sm">
+                <Flex 
+                  key={msg._id} 
+                  p={4} 
+                  bg="white" 
+                  borderRadius="md" 
+                  boxShadow="sm" 
+                  position="relative" 
+                  minHeight="80px"
+                >
+                  {/* Botão de exclusão (só para dono da mensagem) */}
+                  {String(msg.user?._id) === String(user?._id) && (
+                    <Button
+                        colorScheme="red"
+                        size="xs"
+                        position="absolute"
+                        top={8}
+                        right={8}
+                        zIndex={1}
+                        onClick={() => handleDelete(msg._id)}
+                        isLoading={deletingId === msg._id}
+                        loadingText="Excluindo..."
+                    >
+                        Excluir
+                    </Button>
+                        )}
                     <Avatar 
-                        name={msg.user.name} 
-                        src={`/uploads/${msg.user.photo}`} 
+                        name={msg.user?.name} 
+                        src={msg.user?.photo ? `/uploads/${msg.user.photo}` : ''} 
                         size="sm" 
                         mr={3}
                     />

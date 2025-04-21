@@ -20,7 +20,7 @@ import {
   const MeetPage = () => {
     const { meetId } = useParams();
     const navigate = useNavigate();
-    const { user } = userHandler();
+    const { user, loading: userLoading } = userHandler();
     const token = localStorage.getItem('token');
     
     const { 
@@ -44,15 +44,21 @@ import {
       }
     };
   
-    if (!token) {
+
+    // Nova verificação que considera o estado do store
+    if (!userLoading && !user) {
       return (
-        <Alert status="error">
-          <AlertIcon />
-          Você precisa estar logado para ver esta página
-        </Alert>
+        <Container maxW="container.lg" py={8}>
+          <Alert status="error">
+            <AlertIcon />
+            Você precisa estar logado para ver esta página
+          </Alert>
+          <Button onClick={handleBack} mt={4}>
+            Voltar
+          </Button>
+        </Container>
       );
     }
-  
     if (error) {
       return (
         <Container maxW="container.lg" py={8}>

@@ -208,7 +208,7 @@ deleteMessage: async (meetId, messageId) => {
     set(state => ({
         currentMeet: {
         ...state.currentMeet,
-        discussions: state.currentMeet.discussions.filter(
+        messages: state.currentMeet.messages.filter(
             msg => msg._id !== messageId
         ),
         pinnedMessages: state.currentMeet.pinnedMessages.filter(

@@ -19,9 +19,37 @@ api.interceptors.request.use((config) => {
 });
 
 export const userHandler = create((set) => ({
-  user: null,
+  user: JSON.parse(localStorage.getItem("user")) || null,
   error: null,
-  loading: false,
+  loading: true,
+
+  initializeUser: async () => {
+    try {
+      set({ loading: true });
+      const token = localStorage.getItem("token");
+      const savedUser = JSON.parse(localStorage.getItem("user"));
+
+      if (savedUser) set({ user: savedUser });
+      
+      if (!token) {
+        set({ loading: false });
+        return;
+      }
+
+      const response = await api.get("/users/profile");
+      const userData = response.data.data;
+
+      localStorage.setItem("user", JSON.stringify(userData));
+
+      set({ user: userData, loading: false });
+      
+    } catch (error) {
+      console.error("Erro na inicialização:", error);
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      set({ user: null, loading: false });
+    }
+  },
   
   // Ações
   registerUser: async (newUser) => {
@@ -49,6 +77,9 @@ export const userHandler = create((set) => ({
         },
       });
 
+      localStorage.setItem("user", JSON.stringify(data.user));
+      set({ user: data.user });
+
       return { 
         success: true, 
         message: "Usuário registrado com sucesso!",
@@ -64,30 +95,74 @@ export const userHandler = create((set) => ({
     }
   },
 
-  loginUser: async (credentials) => {
+  // ========== NOVO MÉTODO ========== //
+  updateUser: async (updatedData) => {
     try {
-      set({ loading: true, error: null });
-
-      // Validação
-      if (!credentials.email || !credentials.password) {
-        throw new Error("Preencha todos os campos");
-      }
-
-      // Requisição com Axios
-      const { data } = await api.post("/users/login", credentials);
+      set({ loading: true });
       
-      // Armazenar token e atualizar estado
-      localStorage.setItem("token", data.token);
-      set({ user: data.user, error: null });
-
-      return { success: true, message: "Login realizado com sucesso!" };
-
+      const formData = new FormData();
+      if (updatedData.name) formData.append('name', updatedData.name);
+      if (updatedData.photo) formData.append('photo', updatedData.photo);
+      
+      const { data } = await api.patch("/profile", formData);
+      
+      // Atualiza localStorage
+      localStorage.setItem("user", JSON.stringify(data));
+      set({ user: data });
+      
+      return { success: true, message: "Perfil atualizado!" };
+      
     } catch (error) {
       const message = error.response?.data?.error || error.message;
       set({ error: message });
       return { success: false, message };
     } finally {
       set({ loading: false });
+    }
+  },
+
+  // loginUser: async (credentials) => {
+  //   try {
+  //     set({ loading: true, error: null });
+
+  //     // Validação
+  //     if (!credentials.email || !credentials.password) {
+  //       throw new Error("Preencha todos os campos");
+  //     }
+
+  //     // Requisição com Axios
+  //     const { data } = await api.post("/users/login", credentials);
+      
+  //     // Armazenar token e atualizar estado
+  //     localStorage.setItem("token", data.token);
+  //     set({ user: data.user, error: null });
+
+  //     return { success: true, message: "Login realizado com sucesso!" };
+
+  //   } catch (error) {
+  //     const message = error.response?.data?.error || error.message;
+  //     set({ error: message });
+  //     return { success: false, message };
+  //   } finally {
+  //     set({ loading: false });
+  //   }
+  // },
+  // ========== MÉTODOS MODIFICADOS ========== //
+  loginUser: async (credentials) => {
+    try {
+      set({ loading: true, error: null });
+
+      const { data } = await api.post("/users/login", credentials);
+    
+      // Armazena dados no localStorage
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("user", JSON.stringify(data.user)); // Novo
+      
+      set({ user: data.user, error: null });
+      return { success: true, message: "Login realizado com sucesso!" };
+
+    } catch (error) {
+      // ... (existente)
     }
   },
 
