@@ -55,7 +55,7 @@ export const meetHandler = create((set, get) => ({
 
 getMeetById: async (meetId) => { // Recebe o ID como parâmetro
     try {
-      set({ loading: true, error: null });
+      set({ loadingMeet: true, error: null });
 
       const response = await api.get(`/${meetId}`); // Endpoint específico
 
@@ -65,7 +65,8 @@ getMeetById: async (meetId) => { // Recebe o ID como parâmetro
 
       set({ 
         currentMeet: response.data.data,
-        error: null
+        error: null, 
+        loadingMeet: false
     });
 
       return { 
@@ -112,26 +113,6 @@ listMeets: async (params = {}) => {
         set({ loading: false });
     }
 },
-  // Ação original para listagem (renomeada)
-    // listMeets: async (params = {}) => {
-    //     try {
-    //     set({ loading: true, error: null });
-        
-    //     const response = await api.get('/list', { params });
-        
-    //     set({
-    //         meets: response.data.data.meets,
-    //         pagination: response.data.data.pagination
-    //     });
-        
-    //     return { success: true, data: response.data.data };
-
-    //     } catch (error) {
-    //     // Tratamento de erro...
-    //     } finally {
-    //     set({ loading: false });
-    //     }
-    // },
 
 // Atualizar encontro
 updateMeet: async (meetId, updates) => {
@@ -334,6 +315,40 @@ getMeetDetails: async (meetId) => {
     } finally {
     set({ loading: false });
     }
+},
+
+// Listar as mensagens de um encontro específico
+getMeetMessages: async (meetId) => {
+    try {
+        set({ loadingMessages: true, error: null });
+        const { data } = await api.get(`/${meetId}/messages`);
+        
+        // Atualiza o estado com as mensagens e IDs das fixadas
+        set(state => ({
+            currentMeet: {
+            ...state.currentMeet,
+            messages: data.data.messages,
+            pinnedMessages: (data.data.messages || [])
+                .filter(msg => msg.isPinned)
+                .map(msg => msg._id)
+            },
+            loadingMessages: false
+        }));
+
+        return { 
+            success: true, 
+            data: data.data.messages,
+            message: 'Mensagens carregadas com sucesso'
+        };
+        } 
+        catch (error) {
+            const message = error.response?.data?.message || error.message;
+            set({ error: message });
+        return { success: false, message };
+        }  
+        finally {
+            set({ loading: false });
+        }
 },
 
 // Limpar estado atual

@@ -1,4 +1,5 @@
 import { 
+    Badge,
     Box, 
     Heading,
     Textarea, 
@@ -16,40 +17,34 @@ import {
   
   const CommentSection = ({ meetId }) => {
     const [comment, setComment] = useState('');
-    const [comments, setComments] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
     
-    const { addComment, getComments } = meetHandler();
-  
+    const { 
+        currentMeet, 
+        loadingMessages,
+        error,
+        getMeetMessages,
+        addMessage
+    } = meetHandler();
+
     useEffect(() => {
-      const loadComments = async () => {
-        try {
-          const data = await getComments(meetId);
-          setComments(data);
-        } catch (err) {
-          setError('Falha ao carregar comentários');
-        } finally {
-          setLoading(false);
+        if (meetId) {
+            getMeetMessages(meetId);
         }
-      };
-      
-      if(meetId) loadComments();
-    }, [meetId]);
+    }, [meetId, getMeetMessages]);
   
     const handleSubmit = async (e) => {
-      e.preventDefault();
-      try {
-        const newComment = await addComment(meetId, comment);
-        setComments([...comments, newComment]);
-        setComment('');
-      } catch (err) {
-        setError('Falha ao enviar comentário');
-      }
+        e.preventDefault();
+        try {
+            await addMessage(meetId, comment);
+            setComment('');
+            await getMeetMessages(meetId);
+        } catch (err) {
+            console.error('Erro ao enviar mensagem:', err);
+        }
     };
   
     return (
-      <Box mt={8} p={4} bg="gray.50" borderRadius="lg">
+    <Box mt={8} p={4} bg="gray.50" borderRadius="lg">
         <Heading as="h3" size="lg" mb={4}>
           Comentários
         </Heading>
@@ -74,35 +69,40 @@ import {
             </Button>
           </form>
         </Box>
-  
-        {/* Lista de comentários */}
-        {loading && <Spinner mb={4} />}
+
+        {/* Feedback de loading/erro */}
+        {loadingMessages && <Spinner mb={4} />}
         {error && (
-          <Alert status="error" mb={4}>
-            <AlertIcon />
-            {error}
-          </Alert>
+            <Alert status="error" mb={4}>
+                <AlertIcon />
+                {error}
+            </Alert>
         )}
+
+        {/* Lista de mensagens */}
         <VStack spacing={4} align="stretch">
-          {comments.map((c) => (
-            <Flex key={c._id} p={4} bg="white" borderRadius="md" boxShadow="sm">
-              <Avatar 
-                name={c.user.username} 
-                src={c.user.profilePhoto} 
-                size="sm" 
-                mr={3}
-              />
-              <Box>
-                <Text fontWeight="500">{c.user.username}</Text>
-                <Text fontSize="sm" color="gray.600">
-                  {new Date(c.createdAt).toLocaleDateString('pt-BR')}
-                </Text>
-                <Text mt={1}>{c.text}</Text>
-              </Box>
-            </Flex>
-          ))}
+            {currentMeet?.messages?.map((msg) => (
+                <Flex key={msg._id} p={4} bg="white" borderRadius="md" boxShadow="sm">
+                    <Avatar 
+                        name={msg.user.name} 
+                        src={`/uploads/${msg.user.photo}`} 
+                        size="sm" 
+                        mr={3}
+                    />
+                    <Box>
+                        <Text fontWeight="500">{msg.user.name}</Text>
+                        <Text fontSize="sm" color="gray.600">
+                            {new Date(msg.timestamp).toLocaleDateString('pt-BR')}
+                        </Text>
+                        <Text mt={1}>{msg.text}</Text>
+                        {currentMeet?.pinnedMessages?.includes(msg._id) && (
+                            <Badge colorScheme="blue" mt={2}>FIXADO</Badge>
+                        )}
+                    </Box>
+                </Flex>
+            ))}
         </VStack>
-      </Box>
+    </Box>
     );
   };
   

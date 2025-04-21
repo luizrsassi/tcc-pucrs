@@ -762,7 +762,7 @@ export const listMeetMessages = async (req, res) => {
             })
             .populate({
                 path: 'discussions.user',
-                select: 'username profilePhoto'
+                select: 'name photo'
             })
             .lean();
 

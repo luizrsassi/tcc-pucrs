@@ -25,7 +25,7 @@ import {
     
     const { 
       currentMeet,
-      loading,
+      loadingMeet,
       error,
       getMeetById
     } = meetHandler();
@@ -78,7 +78,7 @@ import {
           &larr; Voltar para o Clube
         </Button>
   
-        {loading ? (
+        {loadingMeet ? (
           <Flex justify="center" py={12}>
             <Spinner size="xl" thickness="3px" />
           </Flex>
