@@ -1,72 +1,72 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { 
-  Box,
-  Badge,
-  Tag,
-  Flex,
-  Text, 
-  Heading 
+Box,
+Badge,
+Tag,
+Flex,
+Text, 
+Heading 
 } from '@chakra-ui/react';
 
 const ClubMeetCard = ({ 
-  title,
-  author,
-  date,
-  club,
-  location,
-  description,
-  status,
-  to
+title,
+author,
+date,
+club,
+location,
+description,
+status,
+to
 }) => {
-  const statusColors = {
+const statusColors = {
     agendado: 'blue',
     realizado: 'green',
     cancelado: 'red'
-  };
+};
 
-  return (
+return (
     <Box
-      as={Link}
-      to={to}
-      borderWidth="1px"
-      borderRadius="lg"
-      overflow="hidden"
-      p={4}
-      bg="white"
-      boxShadow="md"
-      _hover={{ boxShadow: 'lg', textDecoration: 'none' }}
-      style={{ textDecoration: 'none' }}
-    >
-      <Flex justify="space-between" align="center" mb={3}>
-        <Badge 
-          colorScheme={statusColors[status] || 'gray'} 
-          fontSize="0.8em"
+        as={Link}
+        to={to}
+        borderWidth="1px"
+        borderRadius="lg"
+        overflow="hidden"
+        p={4}
+        bg="white"
+        boxShadow="md"
+        _hover={{ boxShadow: 'lg', textDecoration: 'none' }}
+        style={{ textDecoration: 'none' }}
         >
-          {status?.toUpperCase()}
-        </Badge>
-        <Tag colorScheme="teal" fontSize="0.8em">{club}</Tag>
-      </Flex>
+        <Flex justify="space-between" align="center" mb={3}>
+            <Badge 
+                colorScheme={statusColors[status] || 'gray'} 
+                fontSize="0.8em"
+            >
+            {status?.toUpperCase()}
+            </Badge>
+            <Tag colorScheme="teal" fontSize="0.8em">{club}</Tag>
+        </Flex>
 
-      <Heading fontSize="xl" mb={2}>{title}</Heading>
-      
-      <Text fontSize="sm" color="gray.600" mb={2}>
-        {description}
-      </Text>
+        <Heading fontSize="xl" mb={2}>{title}</Heading>
+    
+        <Text fontSize="sm" color="gray.600" mb={2}>
+            {description}
+        </Text>
 
-      <Flex direction="column" gap={1} mt={3}>
-        <Text fontSize="sm">
-          <strong>Autor:</strong> {author}
-        </Text>
-        <Text fontSize="sm">
-          <strong>Data:</strong> {date}
-        </Text>
-        <Text fontSize="sm">
-          <strong>Local:</strong> {location}
-        </Text>
-      </Flex>
+        <Flex direction="column" gap={1} mt={3}>
+            <Text fontSize="sm">
+                <strong>Autor:</strong> {author}
+            </Text>
+            <Text fontSize="sm">
+                <strong>Data:</strong> {date}
+            </Text>
+            <Text fontSize="sm">
+                <strong>Local:</strong> {location}
+            </Text>
+        </Flex>
     </Box>
-  );
+);
 };
 
 export default ClubMeetCard;

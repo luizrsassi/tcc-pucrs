@@ -15,6 +15,7 @@ import {
   import { useParams, useNavigate } from 'react-router-dom';
   import { meetHandler } from '../store/meetStore';
   import { userHandler } from '../store/userStore';
+  import CommentSection from '../components/CommentSection';
   
   const MeetPage = () => {
     const { meetId } = useParams();
@@ -167,6 +168,7 @@ import {
                 </Box>
               </Box>
             </Flex>
+            <CommentSection meetId={meetId} />
           </Box>
         )}
       </Container>
