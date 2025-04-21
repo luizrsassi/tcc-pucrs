@@ -748,3 +748,70 @@ export const unpinMessage = async (req, res) => {
         session.endSession();
     }
 };
+
+export const listMeetMessages = async (req, res) => {
+    try {
+        const { meetId } = req.params;
+        const userId = req.user._id;
+
+        // Verificação de acesso e obtenção do encontro
+        const meet = await Meet.findById(meetId)
+            .populate({
+                path: 'clubId',
+                select: 'members'
+            })
+            .populate({
+                path: 'discussions.user',
+                select: 'username profilePhoto'
+            })
+            .lean();
+
+        // Verificações de existência e permissão
+        if (!meet) {
+            return res.status(404).json({
+                success: false,
+                message: 'Encontro não encontrado'
+            });
+        }
+        
+        const isMember = meet.clubId.members.some(member => 
+            member._id.toString() === userId.toString()
+        );
+        
+        if (!isMember) {
+            return res.status(403).json({
+                success: false,
+                message: 'Apenas membros do clube podem ver as mensagens'
+            });
+        }
+
+        // Formatação das mensagens com status de fixação
+        const formattedMessages = meet.discussions.map(msg => ({
+            _id: msg._id,
+            text: msg.text,
+            timestamp: msg.timestamp,
+            user: msg.user,
+            isPinned: meet.pinnedMessages.some(
+                pinnedId => pinnedId.toString() === msg._id.toString()
+            )
+        })).sort((a, b) => b.timestamp - a.timestamp); // Ordena por data decrescente
+
+        return res.status(200).json({
+            success: true,
+            data: {
+                messages: formattedMessages,
+                pinnedCount: meet.pinnedMessages.length
+            },
+            message: 'Mensagens obtidas com sucesso'
+        });
+
+    } catch (error) {
+        console.error('Erro ao listar mensagens:', error);
+        return res.status(500).json({
+            success: false,
+            message: error.name === 'CastError' 
+                ? 'ID do encontro inválido' 
+                : 'Erro interno no servidor'
+        });
+    }
+};
