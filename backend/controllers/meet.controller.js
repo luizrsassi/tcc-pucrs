@@ -320,7 +320,7 @@ export const getMeetById = async (req, res) => {
             .select('-discussions -pinnedMessages')
             .populate([
                 { path: 'book', select: 'title author cover' },
-                { path: 'createdBy', select: 'username profilePhoto' },
+                { path: 'createdBy', select: 'name photo' },
                 { path: 'clubId', select: 'name' }
             ])
             .lean();
@@ -490,7 +490,8 @@ export const addMessageToMeet = async (req, res) => {
         };
 
         meet.discussions.push(newMessage);
-        await meet.save({ session });
+        // await meet.save({ session });
+        await meet.save({ session, validateModifiedOnly: true });
 
         await session.commitTransaction();
 

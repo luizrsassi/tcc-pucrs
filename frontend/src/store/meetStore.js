@@ -27,12 +27,12 @@ export const meetHandler = create((set, get) => ({
     loading: false,
     error: null,
 
-// Criar novo encontro
+    // Criar novo encontro
     createMeet: async (meetData) => {
         try {
         set({ loading: true, error: null });
         
-        const { data } = await api.post('/', meetData);
+        const { data } = await api.post('/:meetId/post', meetData);
         
         set(state => ({
             meets: [data, ...state.meets]
@@ -53,305 +53,268 @@ export const meetHandler = create((set, get) => ({
         }
     },
 
-getMeetById: async (meetId) => { // Recebe o ID como parâmetro
-    try {
-      set({ loadingMeet: true, error: null });
+    getMeetById: async (meetId) => { // Recebe o ID como parâmetro
+        try {
+        set({ loadingMeet: true, error: null });
 
-      const response = await api.get(`/${meetId}`); // Endpoint específico
+        const response = await api.get(`/${meetId}`);
 
-      if (!response.data.success) {
-        throw new Error(response.data.message || "Meet não encontrado");
-      }
-
-      set({ 
-        currentMeet: response.data.data,
-        error: null, 
-        loadingMeet: false
-    });
-
-      return { 
-        success: true,
-        data: response.data.data,
-        message: response.data.message 
-      };
-
-    } catch (error) {
-      const message = error.response?.data?.message || 
-                     error.message || 
-                     "Erro ao carregar meet";
-      set({ error: message });
-      return { success: false, message };
-    } finally {
-      set({ loading: false });
-    }
-  },
-// Listar encontros com paginação
-listMeets: async (params = {}) => {
-    try {
-    set({ loading: true, error: null });
-
-    const response = await api.get('/list', {
-        params: {
-          page: params.page || 1,
-          limit: params.limit || 9,
-          search: params.search || ''
+        if (!response.data.success) {
+            throw new Error(response.data.message || "Meet não encontrado");
         }
-      });
-    
-    set({
-        meets: response.data.data.meets,
-        pagination: response.data.data.pagination
-    });
 
-    return { success: true, data: data.meets };
+        set({ 
+            currentMeet: response.data.data,
+            error: null, 
+            loadingMeet: false
+        });
 
-    } catch (error) {
-        const message = error.response?.data?.message || error.message;
+        return { 
+            success: true,
+            data: response.data.data,
+            message: response.data.message 
+        };
+
+        } catch (error) {
+        const message = error.response?.data?.message || 
+                        error.message || 
+                        "Erro ao carregar meet";
         set({ error: message });
         return { success: false, message };
-    } finally {
+        } finally {
         set({ loading: false });
-    }
-},
-
-// Atualizar encontro
-updateMeet: async (meetId, updates) => {
-    try {
-    set({ loading: true, error: null });
-    
-    const { data } = await api.put(`/${meetId}`, updates);
-    
-    set(state => ({
-        meets: state.meets.map(meet => 
-        meet._id === meetId ? data : meet
-        ),
-        currentMeet: data
-    }));
-
-    return { 
-        success: true, 
-        data,
-        message: 'Encontro atualizado com sucesso!' 
-    };
-
-    } catch (error) {
-    const message = error.response?.data?.message || error.message;
-    set({ error: message });
-    return { success: false, message };
-    } finally {
-    set({ loading: false });
-    }
-},
-
-// Excluir encontro
-deleteMeet: async (meetId) => {
-    try {
-    set({ loading: true, error: null });
-    
-    await api.delete(`/${meetId}`);
-    
-    set(state => ({
-        meets: state.meets.filter(meet => meet._id !== meetId),
-        currentMeet: null
-    }));
-
-    return { 
-        success: true, 
-        message: 'Encontro excluído com sucesso!' 
-    };
-
-    } catch (error) {
-    const message = error.response?.data?.message || error.message;
-    set({ error: message });
-    return { success: false, message };
-    } finally {
-    set({ loading: false });
-    }
-},
-
-// Adicionar mensagem
-addMessage: async (meetId, text) => {
-    try {
-    set({ loading: true, error: null });
-    
-    const { data } = await api.post(`/${meetId}/messages`, { text });
-    
-    set(state => ({
-        currentMeet: {
-        ...state.currentMeet,
-        discussions: [...state.currentMeet.discussions, data]
         }
-    }));
+    },
 
-    return { 
-        success: true, 
-        data,
-        message: 'Mensagem adicionada com sucesso!' 
-    };
+    // Listar encontros com paginação
+    listMeets: async (params = {}) => {
+        try {
+        set({ loading: true, error: null });
 
-    } catch (error) {
-    const message = error.response?.data?.message || error.message;
-    set({ error: message });
-    return { success: false, message };
-    } finally {
-    set({ loading: false });
-    }
-},
-
-// Excluir mensagem
-deleteMessage: async (meetId, messageId) => {
-    try {
-    set({ loading: true, error: null });
-    
-    await api.delete(`/${meetId}/post/${messageId}`);
-    
-    set(state => ({
-        currentMeet: {
-        ...state.currentMeet,
-        messages: state.currentMeet.messages.filter(
-            msg => msg._id !== messageId
-        ),
-        pinnedMessages: state.currentMeet.pinnedMessages.filter(
-            id => id !== messageId
-        )
-        }
-    }));
-
-    return { 
-        success: true, 
-        message: 'Mensagem excluída com sucesso!' 
-    };
-
-    } catch (error) {
-    const message = error.response?.data?.message || error.message;
-    set({ error: message });
-    return { success: false, message };
-    } finally {
-    set({ loading: false });
-    }
-},
-
-// Fixar mensagem
-pinMessage: async (meetId, messageId) => {
-    try {
-    set({ loading: true, error: null });
-    
-    const { data } = await api.post(`/${meetId}/pin/${messageId}`);
-    
-    set(state => ({
-        currentMeet: {
-        ...state.currentMeet,
-        pinnedMessages: data.pinnedMessages
-        }
-    }));
-
-    return { 
-        success: true, 
-        message: 'Mensagem fixada com sucesso!' 
-    };
-
-    } catch (error) {
-    const message = error.response?.data?.message || error.message;
-    set({ error: message });
-    return { success: false, message };
-    } finally {
-    set({ loading: false });
-    }
-},
-
-// Desafixar mensagem
-unpinMessage: async (meetId, messageId) => {
-    try {
-    set({ loading: true, error: null });
-    
-    await api.delete(`/${meetId}/pin/${messageId}`);
-    
-    set(state => ({
-        currentMeet: {
-        ...state.currentMeet,
-        pinnedMessages: state.currentMeet.pinnedMessages.filter(
-            id => id !== messageId
-        )
-        }
-    }));
-
-    return { 
-        success: true, 
-        message: 'Mensagem desafixada com sucesso!' 
-    };
-
-    } catch (error) {
-    const message = error.response?.data?.message || error.message;
-    set({ error: message });
-    return { success: false, message };
-    } finally {
-    set({ loading: false });
-    }
-},
-
-// Carregar detalhes de um encontro
-getMeetDetails: async (meetId) => {
-    try {
-    set({ loading: true, error: null });
-    
-    const { data } = await api.get(`/${meetId}`, {
-        params: {
-        populate: 'discussions.user,book,clubId'
-        }
-    });
-    
-    set({ currentMeet: data });
-
-    return { 
-        success: true, 
-        data,
-        message: 'Detalhes carregados com sucesso!' 
-    };
-
-    } catch (error) {
-    const message = error.response?.data?.message || error.message;
-    set({ error: message });
-    return { success: false, message };
-    } finally {
-    set({ loading: false });
-    }
-},
-
-// Listar as mensagens de um encontro específico
-getMeetMessages: async (meetId) => {
-    try {
-        set({ loadingMessages: true, error: null });
-        const { data } = await api.get(`/${meetId}/messages`);
+        const response = await api.get('/list', {
+            params: {
+            page: params.page || 1,
+            limit: params.limit || 9,
+            search: params.search || ''
+            }
+        });
         
-        // Atualiza o estado com as mensagens e IDs das fixadas
+        set({
+            meets: response.data.data.meets,
+            pagination: response.data.data.pagination
+        });
+
+        return { success: true, data: data.meets };
+
+        } catch (error) {
+            const message = error.response?.data?.message || error.message;
+            set({ error: message });
+            return { success: false, message };
+        } finally {
+            set({ loading: false });
+        }
+    },
+
+    // Atualizar encontro
+    updateMeet: async (meetId, updates) => {
+        try {
+        set({ loading: true, error: null });
+        
+        const { data } = await api.put(`/${meetId}`, updates);
+        
         set(state => ({
-            currentMeet: {
-            ...state.currentMeet,
-            messages: data.data.messages,
-            pinnedMessages: (data.data.messages || [])
-                .filter(msg => msg.isPinned)
-                .map(msg => msg._id)
-            },
-            loadingMessages: false
+            meets: state.meets.map(meet => 
+            meet._id === meetId ? data : meet
+            ),
+            currentMeet: data
         }));
 
         return { 
             success: true, 
-            data: data.data.messages,
-            message: 'Mensagens carregadas com sucesso'
+            data,
+            message: 'Encontro atualizado com sucesso!' 
         };
-        } 
-        catch (error) {
+
+        } catch (error) {
+        const message = error.response?.data?.message || error.message;
+        set({ error: message });
+        return { success: false, message };
+        } finally {
+        set({ loading: false });
+        }
+    },
+
+    // Excluir encontro
+    deleteMeet: async (meetId) => {
+        try {
+        set({ loading: true, error: null });
+        
+        await api.delete(`/${meetId}`);
+        
+        set(state => ({
+            meets: state.meets.filter(meet => meet._id !== meetId),
+            currentMeet: null
+        }));
+        
+        return { 
+            success: true, 
+            message: 'Encontro excluído com sucesso!' 
+        };
+
+        } catch (error) {
             const message = error.response?.data?.message || error.message;
             set({ error: message });
-        return { success: false, message };
-        }  
-        finally {
+            return { success: false, message };
+        } finally {
             set({ loading: false });
         }
-},
+    },
 
-// Limpar estado atual
-clearCurrentMeet: () => set({ currentMeet: null }),
-clearError: () => set({ error: null })
+    addMessage: async (meetId, text) => {
+        try {
+            set({ loading: true, error: null });
+            
+            // 1. Fazer requisição para a API
+            const response = await api.post(`/${meetId}/post`, { text });
+            
+            // 2. Extrair mensagem da resposta
+            const newMessage = response.data.data;
+            
+            // 3. Atualizar estado otimista
+            set(state => ({
+                currentMeet: {
+                ...state.currentMeet,
+                discussions: [...(state.currentMeet?.discussions || []), newMessage]
+                }
+            }));
+        
+            return { 
+                success: true,
+                data: newMessage,
+                message: 'Mensagem enviada com sucesso!'
+            };
+    
+        } catch (error) {
+            // 4. Tratamento de erros específicos
+            let message = 'Erro ao enviar mensagem';
+            
+            if (error.response) {
+                message = error.response.data.message || message;
+                
+                // Tratar erro de permissão especificamente
+                if (error.response.status === 403) {
+                message = "Apenas membros podem enviar mensagens";
+                }
+            }
+        
+            set({ error: message });
+            return { 
+                success: false, 
+                message,
+                errorType: error.response?.status
+            };
+        
+        } finally {
+            set({ loading: false });
+        }
+    },
+
+    // Excluir mensagem
+    deleteMessage: async (meetId, messageId) => {
+        try {
+        set({ loading: true, error: null });
+        
+        await api.delete(`/${meetId}/post/${messageId}`);
+        
+        set(state => ({
+            currentMeet: {
+            ...state.currentMeet,
+            discussions: (state.currentMeet?.discussions || []).filter(
+                msg => msg._id !== messageId
+            ),
+            pinnedMessages: (state.currentMeet?.pinnedMessages || []).filter(
+                id => id !== messageId
+            )
+            }
+        }));
+
+        return { 
+            success: true, 
+            message: 'Mensagem excluída com sucesso!' 
+        };
+
+        } catch (error) {
+        const message = error.response?.data?.message || error.message;
+        set({ error: message });
+        return { success: false, message };
+        } finally {
+        set({ loading: false });
+        }
+    },
+
+    // Carregar detalhes de um encontro
+    getMeetDetails: async (meetId) => {
+        try {
+        set({ loading: true, error: null });
+        
+        const { data } = await api.get(`/${meetId}`, {
+            params: {
+            populate: 'discussions.user,book,clubId'
+            }
+        });
+        
+        set({ currentMeet: data });
+
+        return { 
+            success: true, 
+            data,
+            message: 'Detalhes carregados com sucesso!' 
+        };
+
+        } catch (error) {
+        const message = error.response?.data?.message || error.message;
+        set({ error: message });
+        return { success: false, message };
+        } finally {
+        set({ loading: false });
+        }
+    },
+
+    // Listar as mensagens de um encontro específico
+    getMeetMessages: async (meetId) => {
+        try {
+            set({ loadingMessages: true, error: null });
+            const { data } = await api.get(`/${meetId}/messages`);
+            
+            // Atualiza o estado com as mensagens e IDs das fixadas
+            set(state => ({
+                currentMeet: {
+                ...state.currentMeet,
+                discussions: data.data.messages,
+                pinnedMessages: (data.data.messages || [])
+                    .filter(msg => msg.isPinned)
+                    .map(msg => msg._id)
+                },
+                loadingMessages: false
+            }));
+
+            return { 
+                success: true, 
+                data: data.data.messages,
+                message: 'Mensagens carregadas com sucesso'
+            };
+            } 
+            catch (error) {
+                const message = error.response?.data?.message || error.message;
+                set({ error: message });
+            return { success: false, message };
+            }  
+            finally {
+                set({ loading: false });
+            }
+    },
+
+    // Limpar estado atual
+    clearCurrentMeet: () => set({ currentMeet: null }),
+    clearError: () => set({ error: null })
 }));

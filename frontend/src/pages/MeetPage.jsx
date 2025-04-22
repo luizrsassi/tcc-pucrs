@@ -156,12 +156,12 @@ import {
                   
                   <Flex align="center" gap={3}>
                     <Avatar
-                      name={currentMeet.organizer?.username}
-                      src={currentMeet.organizer?.profilePhoto}
+                      name={currentMeet.organizer?.name}
+                      src={currentMeet.organizer?.photo}
                       size="md"
                     />
                     <Text fontWeight="500">
-                      {currentMeet.organizer?.username || 'Organizador não identificado'}
+                      {currentMeet.organizer?.name || 'Organizador não identificado'}
                     </Text>
                   </Flex>
   
