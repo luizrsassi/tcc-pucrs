@@ -16,6 +16,7 @@ import {
   import { meetHandler } from '../store/meetStore';
   import { userHandler } from '../store/userStore';
   import CommentSection from '../components/CommentSection';
+  import NavBar from '../components/Navbar';
   
   const MeetPage = () => {
     const { meetId } = useParams();
@@ -74,7 +75,9 @@ import {
     }
   
     return (
+      
       <Container maxW="container.lg" py={8}>
+        <NavBar />
         <Button 
           onClick={handleBack}
           mb={8}

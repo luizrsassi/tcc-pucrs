@@ -585,7 +585,7 @@ export const deleteMessage = async (req, res) => {
             pinnedId => pinnedId.toString() !== messageId
         );
 
-        await meet.save({ session });
+        await meet.save({ session, validateModifiedOnly: true });
         await session.commitTransaction();
 
         return res.status(200).json({
