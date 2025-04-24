@@ -6,6 +6,7 @@ import ClubMeetCard from '../components/ClubMeetCard';
 import EditMeetModal from '../components/EditMeetModal';
 import NavBar from '../components/Navbar';
 import SearchBar from '../components/SearchBar';
+import CreateMeetModal from '../components/CreateMeetModal';
 import { clubHandler } from '../store/clubStore';
 import { userHandler } from '../store/userStore';
 import { debounce } from 'lodash';
@@ -17,6 +18,7 @@ const ClubPage = () => {
     const token = localStorage.getItem('token');
     const [selectedMeetId, setSelectedMeetId] = useState(null); // Alterado para armazenar apenas o ID
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
     const {
         clubMeets,
@@ -84,12 +86,29 @@ const ClubPage = () => {
             <MainContainer />
 
             <Container maxW="980px" py={8}>
-                <Box mb={8}>
-                    <SearchBar 
-                        onSearch={setSearchTerm}
-                        placeholder="Pesquisar encontros..."
-                    />
-                </Box>
+                <Flex direction="column" gap={3}>
+                    <Button 
+                        colorScheme="blue" 
+                        variant="solid"
+                        onClick={() => setIsCreateModalOpen(true)}
+                        size="sm"
+                        borderRadius="md"
+                        px={3}
+                        py={1}
+                        fontWeight="medium"
+                        letterSpacing="wide"
+                        _hover={{ bg: "blue.400" }}
+                    >
+                        Novo Encontro
+                    </Button> 
+
+                    <Box mb={8}>
+                        <SearchBar 
+                            onSearch={setSearchTerm}
+                            placeholder="Pesquisar encontros..."
+                        />
+                    </Box>
+                </Flex>
 
                 {error && (
                     <Text color="red.500" mb={4}>{error}</Text>
@@ -108,6 +127,7 @@ const ClubPage = () => {
                             key={meet._id}
                             title={meet.title}
                             author={meet.book?.author || 'Autor não especificado'}
+                            bookTitle={meet.book?.title || 'Título não esecificado'}
                             isAdmin={true}
                             date={new Date(meet.datetime).toLocaleDateString('pt-BR', {
                                 day: '2-digit',
@@ -154,8 +174,16 @@ const ClubPage = () => {
                 <EditMeetModal
                     isOpen={isEditModalOpen}
                     onClose={handleCloseModal}
-                    meetId={selectedMeetId} // Passa o ID ao invés do objeto completo
+                    meetId={selectedMeetId}
                     onSuccess={handleUpdateSuccess}
+                />
+                <CreateMeetModal
+                    isOpen={isCreateModalOpen}
+                    onClose={() => setIsCreateModalOpen(false)}
+                    clubId={clubId}
+                    onSuccess={() => {
+                        listClubMeets(clubId, currentPage, searchTerm);
+                    }}
                 />
             </Container>
         </Box>

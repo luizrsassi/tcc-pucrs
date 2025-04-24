@@ -30,26 +30,27 @@ export const meetHandler = create((set, get) => ({
     // Criar novo encontro
     createMeet: async (meetData) => {
         try {
-        set({ loading: true, error: null });
+        set({ creatingMeet: true, error: null });
         
-        const { data } = await api.post('/:meetId/post', meetData);
-        
+        const response = await api.post('/create', {
+            clubId: meetData.clubId,
+            title: meetData.title,
+            description: meetData.description,
+            datetime: meetData.datetime,
+            location: meetData.location,
+            bookId: meetData.bookId
+        });
+    
         set(state => ({
-            meets: [data, ...state.meets]
+            meets: [response.data.data, ...state.meets]
         }));
-
-        return { 
-            success: true, 
-            data,
-            message: 'Encontro criado com sucesso!' 
-        };
-
+    
+        return { success: true, data: response.data.data };
+        
         } catch (error) {
-        const message = error.response?.data?.message || error.message;
-        set({ error: message });
-        return { success: false, message };
+        // Tratamento de erros...
         } finally {
-        set({ loading: false });
+        set({ creatingMeet: false });
         }
     },
 

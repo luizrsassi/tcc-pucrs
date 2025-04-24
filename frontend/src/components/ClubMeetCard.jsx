@@ -14,6 +14,7 @@ import { EditIcon } from '@chakra-ui/icons';
 const ClubMeetCard = ({ 
 title,
 author,
+bookTitle,
 date,
 club,
 location,
@@ -62,6 +63,9 @@ return (
         </Text>
 
         <Flex direction="column" gap={1} mt={3}>
+            <Text fontSize="sm">
+                <strong>Livro:</strong> {bookTitle}
+            </Text>
             <Text fontSize="sm">
                 <strong>Autor:</strong> {author}
             </Text>
