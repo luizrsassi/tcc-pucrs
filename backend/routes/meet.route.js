@@ -7,7 +7,7 @@ const router = express.Router();
 router.post("/create", authMiddleware, createMeet);
 router.get("/list", authMiddleware, listMeets);
 router.get("/:id", authMiddleware, getMeetById);
-router.put("/update/:meetId", authMiddleware, updateMeet);
+router.put("/:meetId", authMiddleware, updateMeet);
 router.delete("/delete/:meetId", authMiddleware, deleteMeet);
 router.post("/:meetId/post", authMiddleware, addMessageToMeet);
 router.delete("/:meetId/post/:messageId", authMiddleware, deleteMessage);

@@ -315,3 +315,33 @@ export const listBooks = async (req, res) => {
       });
   }
 };
+
+// Adicione em book.controller.js
+export const getBookById = async (req, res) => {
+    try {
+      const { bookId } = req.params;
+      
+      const book = await Book.findById(bookId)
+        .select('title author')
+        .lean();
+  
+      if (!book) {
+        return res.status(404).json({ 
+          success: false, 
+          message: 'Livro não encontrado' 
+        });
+      }
+  
+      res.status(200).json({ 
+        success: true, 
+        data: book 
+      });
+  
+    } catch (error) {
+      console.error('Erro ao buscar livro:', error);
+      res.status(500).json({ 
+        success: false, 
+        message: 'Erro no servidor' 
+      });
+    }
+  };

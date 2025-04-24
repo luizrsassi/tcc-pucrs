@@ -118,29 +118,35 @@ export const meetHandler = create((set, get) => ({
     // Atualizar encontro
     updateMeet: async (meetId, updates) => {
         try {
-        set({ loading: true, error: null });
+            set({ loading: true, error: null });
+            
+            const formattedUpdates = {
+            ...updates,
+            datetime: new Date(updates.datetime).toISOString()
+            };
+
+            const response = await api.put(`/${meetId}`, formattedUpdates);
+            const updatedMeet = response.data.data;
         
-        const { data } = await api.put(`/${meetId}`, updates);
-        
-        set(state => ({
-            meets: state.meets.map(meet => 
-            meet._id === meetId ? data : meet
+            set(state => ({
+                meets: state.meets.map(meet => 
+                meet._id === meetId ? updatedMeet : meet
             ),
-            currentMeet: data
-        }));
-
-        return { 
-            success: true, 
-            data,
-            message: 'Encontro atualizado com sucesso!' 
-        };
-
+                currentMeet: updatedMeet
+            }));
+        
+            return { 
+                success: true, 
+                data: updatedMeet,
+                message: 'Encontro atualizado com sucesso!' 
+            };
+        
         } catch (error) {
-        const message = error.response?.data?.message || error.message;
-        set({ error: message });
-        return { success: false, message };
+            const message = error.response?.data?.message || error.message;
+            set({ error: message });
+            return { success: false, message };
         } finally {
-        set({ loading: false });
+            set({ loading: false });
         }
     },
 

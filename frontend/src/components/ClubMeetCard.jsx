@@ -6,8 +6,10 @@ Badge,
 Tag,
 Flex,
 Text, 
-Heading 
+Heading,
+IconButton
 } from '@chakra-ui/react';
+import { EditIcon } from '@chakra-ui/icons';
 
 const ClubMeetCard = ({ 
 title,
@@ -17,7 +19,9 @@ club,
 location,
 description,
 status,
-to
+to,
+onEdit,
+isAdmin 
 }) => {
 const statusColors = {
     agendado: 'blue',
@@ -37,7 +41,10 @@ return (
         boxShadow="md"
         _hover={{ boxShadow: 'lg', textDecoration: 'none' }}
         style={{ textDecoration: 'none' }}
+        position="relative"
+        pb={8}
         >
+
         <Flex justify="space-between" align="center" mb={3}>
             <Badge 
                 colorScheme={statusColors[status] || 'gray'} 
@@ -65,6 +72,26 @@ return (
                 <strong>Local:</strong> {location}
             </Text>
         </Flex>
+        {/* Botão na parte inferior direita */}
+        {isAdmin && (
+            <Box
+                position="absolute"
+                bottom={2}
+                right={2}
+            >
+                <IconButton
+                    aria-label="Editar encontro"
+                    icon={<EditIcon />}
+                    size="sm"
+                    colorScheme="blue"
+                    onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        onEdit();
+                    }}
+                />
+            </Box>
+        )}
     </Box>
 );
 };

@@ -3,31 +3,33 @@ import { useState, useEffect, useCallback } from 'react';
 import { useNavigate, Navigate, useParams } from 'react-router-dom';
 import MainContainer from '../components/MainContainer';
 import ClubMeetCard from '../components/ClubMeetCard';
+import EditMeetModal from '../components/EditMeetModal';
 import NavBar from '../components/Navbar';
 import SearchBar from '../components/SearchBar';
-import { clubHandler } from '../store/clubStore'; // Alterado para clubHandler
+import { clubHandler } from '../store/clubStore';
 import { userHandler } from '../store/userStore';
 import { debounce } from 'lodash';
 
 const ClubPage = () => {
     const navigate = useNavigate();
-    const { clubId } = useParams(); // Obtém o ID do clube da URL
+    const { clubId } = useParams();
     const { user } = userHandler();
     const token = localStorage.getItem('token');
+    const [selectedMeetId, setSelectedMeetId] = useState(null); // Alterado para armazenar apenas o ID
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
     const {
-        clubMeets, // Dados específicos do clube
+        clubMeets,
         currentPage,
         totalPages,
         loading,
         error,
-        listClubMeets // Nova função do store
+        listClubMeets
     } = clubHandler();
 
     const [searchTerm, setSearchTerm] = useState('');
     const itemsPerPage = 9;
 
-    // Debounce para pesquisa otimizado
     const debouncedSearch = useCallback(
         debounce((searchValue) => {
             listClubMeets(clubId, 1, searchValue);
@@ -35,19 +37,16 @@ const ClubPage = () => {
         [clubId, listClubMeets]
     );
 
-    // Verificação de autenticação
     useEffect(() => {
         if (!token) navigate('/login');
     }, [navigate, token]);
 
-    // Carregamento inicial e atualizações
     useEffect(() => {
         if (clubId) {
             listClubMeets(clubId, currentPage, searchTerm);
         }
     }, [clubId, currentPage, searchTerm, listClubMeets]);
 
-    // Atualização da pesquisa
     useEffect(() => {
         if (searchTerm.trim()) {
             debouncedSearch(searchTerm);
@@ -58,6 +57,23 @@ const ClubPage = () => {
 
     const handlePageChange = (newPage) => {
         listClubMeets(clubId, newPage, searchTerm);
+    };
+
+    // Função modificada para usar apenas o ID
+    const handleEditMeet = (meetId) => {
+        setSelectedMeetId(meetId);
+        setIsEditModalOpen(true);
+    };
+
+    // Função para fechar modal e limpar estado
+    const handleCloseModal = () => {
+        setIsEditModalOpen(false);
+        setSelectedMeetId(null); // Limpa o ID selecionado
+    };
+
+    const handleUpdateSuccess = () => {
+        listClubMeets(clubId, currentPage, searchTerm);
+        handleCloseModal();
     };
 
     if (!token) return <Navigate to="/login" replace />;
@@ -92,6 +108,7 @@ const ClubPage = () => {
                             key={meet._id}
                             title={meet.title}
                             author={meet.book?.author || 'Autor não especificado'}
+                            isAdmin={true}
                             date={new Date(meet.datetime).toLocaleDateString('pt-BR', {
                                 day: '2-digit',
                                 month: 'long',
@@ -104,6 +121,7 @@ const ClubPage = () => {
                             description={meet.description}
                             status={meet.status}
                             to={`/meets/${meet._id}`}
+                            onEdit={() => handleEditMeet(meet._id)} // Passa apenas o ID
                         />
                     ))}
                 </Grid>
@@ -131,6 +149,14 @@ const ClubPage = () => {
                         Próxima
                     </Button>
                 </Flex>
+
+                {/* Modal atualizado com novas props */}
+                <EditMeetModal
+                    isOpen={isEditModalOpen}
+                    onClose={handleCloseModal}
+                    meetId={selectedMeetId} // Passa o ID ao invés do objeto completo
+                    onSuccess={handleUpdateSuccess}
+                />
             </Container>
         </Box>
     );
