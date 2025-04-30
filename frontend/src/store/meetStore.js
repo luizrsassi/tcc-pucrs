@@ -156,7 +156,7 @@ export const meetHandler = create((set, get) => ({
         try {
         set({ loading: true, error: null });
         
-        await api.delete(`/${meetId}`);
+        await api.delete(`/delete/${meetId}`);
         
         set(state => ({
             meets: state.meets.filter(meet => meet._id !== meetId),

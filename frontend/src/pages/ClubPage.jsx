@@ -7,6 +7,7 @@ import EditMeetModal from '../components/EditMeetModal';
 import NavBar from '../components/Navbar';
 import SearchBar from '../components/SearchBar';
 import CreateMeetModal from '../components/CreateMeetModal';
+import DeleteMeetModal from '../components/DeleteMeetModal';
 import { clubHandler } from '../store/clubStore';
 import { userHandler } from '../store/userStore';
 import { debounce } from 'lodash';
@@ -16,9 +17,10 @@ const ClubPage = () => {
     const { clubId } = useParams();
     const { user } = userHandler();
     const token = localStorage.getItem('token');
-    const [selectedMeetId, setSelectedMeetId] = useState(null); // Alterado para armazenar apenas o ID
+    const [selectedMeetId, setSelectedMeetId] = useState(null);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+    const [meetToDelete, setMeetToDelete] = useState(null);
 
     const {
         clubMeets,
@@ -61,16 +63,26 @@ const ClubPage = () => {
         listClubMeets(clubId, newPage, searchTerm);
     };
 
-    // Função modificada para usar apenas o ID
     const handleEditMeet = (meetId) => {
         setSelectedMeetId(meetId);
         setIsEditModalOpen(true);
     };
 
+    const handleDeleteMeet = (meetId) => {
+        setMeetToDelete(meetId);
+    };
+
+    // Função de confirmação de delete
+    const handleConfirmDelete = (deletedMeetId) => {
+        setMeetToDelete(null);
+        listClubMeets(clubId, currentPage, searchTerm)
+            .catch(error => console.error("Erro na recarga:", error));        
+    };
+
     // Função para fechar modal e limpar estado
     const handleCloseModal = () => {
         setIsEditModalOpen(false);
-        setSelectedMeetId(null); // Limpa o ID selecionado
+        setSelectedMeetId(null);
     };
 
     const handleUpdateSuccess = () => {
@@ -141,7 +153,8 @@ const ClubPage = () => {
                             description={meet.description}
                             status={meet.status}
                             to={`/meets/${meet._id}`}
-                            onEdit={() => handleEditMeet(meet._id)} // Passa apenas o ID
+                            onEdit={() => handleEditMeet(meet._id)}
+                            onDelete={() => handleDeleteMeet(meet._id)}
                         />
                     ))}
                 </Grid>
@@ -184,6 +197,12 @@ const ClubPage = () => {
                     onSuccess={() => {
                         listClubMeets(clubId, currentPage, searchTerm);
                     }}
+                />
+                <DeleteMeetModal
+                    isOpen={meetToDelete}
+                    onClose={() => setMeetToDelete(null)}
+                    onConfirm={() => handleConfirmDelete(meetToDelete)}
+                    meetId={meetToDelete}
                 />
             </Container>
         </Box>

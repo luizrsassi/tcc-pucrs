@@ -41,7 +41,7 @@ import {
       if (isOpen && meetId) {
         getMeetById(meetId);
       } else {
-        clearCurrentMeet(); // Limpar dados anteriores
+        clearCurrentMeet();
         setFormData({
             title: '',
             description: '',
@@ -52,26 +52,6 @@ import {
       }
     }, [isOpen, meetId, getMeetById, clearCurrentMeet]);
   
-    // Atualiza o formulário quando os dados do encontro são carregados
-    // useEffect(() => {
-    //   if (currentMeet && currentMeet.datetime) {
-    //     const formatDateForInput = (isoString) => {
-    //       const date = new Date(isoString);
-    //       return new Date(date.getTime() - (date.getTimezoneOffset() * 60000))
-    //         .toISOString()
-    //         .slice(0, 16);
-    //     };
-  
-    //     setFormData({
-    //       title: currentMeet.title,
-    //       description: currentMeet.description,
-    //       datetime: formatDateForInput(currentMeet.datetime),
-    //       location: currentMeet.location,
-    //       book: currentMeet.book?._id || currentMeet.book || ''
-    //     });
-    //   }
-    // }, [currentMeet]);
-    // Atualizar formulário quando dados mudarem
     useEffect(() => {
         if (currentMeet && currentMeet._id === meetId) {
         const formatDateForInput = (isoString) => {

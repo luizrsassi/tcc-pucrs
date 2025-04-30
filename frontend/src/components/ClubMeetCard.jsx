@@ -9,7 +9,7 @@ Text,
 Heading,
 IconButton
 } from '@chakra-ui/react';
-import { EditIcon } from '@chakra-ui/icons';
+import { EditIcon, DeleteIcon } from '@chakra-ui/icons';
 
 const ClubMeetCard = ({ 
 title,
@@ -22,6 +22,7 @@ description,
 status,
 to,
 onEdit,
+onDelete,
 isAdmin 
 }) => {
 const statusColors = {
@@ -78,11 +79,23 @@ return (
         </Flex>
         {/* Botão na parte inferior direita */}
         {isAdmin && (
-            <Box
+            <Flex
                 position="absolute"
                 bottom={2}
                 right={2}
+                gap={1}
             >
+                <IconButton
+                    aria-label="Deletar encontro"
+                    icon={<DeleteIcon />}
+                    size="sm"
+                    colorScheme="red"
+                    onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        onDelete();
+                    }}
+                />
                 <IconButton
                     aria-label="Editar encontro"
                     icon={<EditIcon />}
@@ -94,7 +107,7 @@ return (
                         onEdit();
                     }}
                 />
-            </Box>
+            </Flex>
         )}
     </Box>
 );
