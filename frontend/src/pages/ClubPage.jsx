@@ -204,7 +204,10 @@ const ClubPage = () => {
     return (
         <Box bg="#F5F5F5" minH="100vh">
             <NavBar user={user} />
-            <MainContainer banner={currentClub?.banner} />
+            <MainContainer 
+                banner={currentClub?.banner}
+                clubName={currentClub?.name}
+            />
 
             <Container maxW="980px" py={8}>
                 <Flex direction="column" gap={3}>

@@ -1,7 +1,7 @@
 import { Container, Box, Text } from '@chakra-ui/react';
 import React from 'react';
 
-const MainContainer = ({ banner }) => {
+const MainContainer = ({ banner, clubName }) => {
     return (
         <Container 
             width="100vw" 
@@ -52,7 +52,7 @@ const MainContainer = ({ banner }) => {
                         color="#150EDD"
                         textShadow="0px 2px 4px rgba(0, 0, 0, 0.1)"
                     >
-                        Clube de Leitura de Botucatu
+                       {clubName}
                     </Text>
                 </Box>
             </Box>
