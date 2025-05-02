@@ -624,3 +624,42 @@ export const removeMember = async (req, res) => {
         session.endSession();
     }
 };
+
+export const getClub = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const club = await Club.findById(id)
+            .populate('admin', 'username avatar')
+            .populate('members', 'username profilePhoto')
+            .lean();
+
+        if (!club) {
+            return res.status(404).json({
+                success: false,
+                message: 'Clube não encontrado'
+            });
+        }
+
+        // Formatação para manter consistência com listClubs
+        const formattedClub = {
+            ...club,
+            membersCount: club.members?.length || 0,
+            banner: club.banner || 'https://via.placeholder.com/350x200?text=Banner+do+Clube',
+            admin: club.admin || { username: 'Admin removido' }
+        };
+
+        return res.status(200).json({
+            success: true,
+            data: formattedClub,
+            message: 'Clube carregado com sucesso'
+        });
+
+    } catch (error) {
+        console.error('Erro ao buscar clube:', error);
+        return res.status(500).json({
+            success: false,
+            message: 'Erro interno no servidor'
+        });
+    }
+};

@@ -228,6 +228,20 @@ export const clubHandler = create((set, get) => ({
     }
   },
 
+  getClubById: async (clubId) => {
+    try {
+        set({ loading: true });
+        const response = await api.get(`/${clubId}`);
+        set({ currentClub: response.data.data });
+        return response.data;
+      } catch (error) {
+        set({ error: error.message });
+        throw error;
+      } finally {
+        set({ loading: false });
+      }
+  },
+
   // Ação para remover membro
   removeMember: async (clubId, memberId) => {
     try {

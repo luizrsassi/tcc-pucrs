@@ -1,3 +1,108 @@
+// import { Box, Container, Grid, Flex, Button, Text } from '@chakra-ui/react';
+// import { useState, useEffect, useCallback } from 'react';
+// import { useNavigate, Navigate, useParams } from 'react-router-dom';
+// import MainContainer from '../components/MainContainer';
+// import ClubMeetCard from '../components/ClubMeetCard';
+// import EditMeetModal from '../components/EditMeetModal';
+// import NavBar from '../components/Navbar';
+// import SearchBar from '../components/SearchBar';
+// import CreateMeetModal from '../components/CreateMeetModal';
+// import DeleteMeetModal from '../components/DeleteMeetModal';
+// import { clubHandler } from '../store/clubStore';
+// import { userHandler } from '../store/userStore';
+// import { debounce } from 'lodash';
+
+// const ClubPage = () => {
+//     const navigate = useNavigate();
+//     const { clubId } = useParams();
+//     const { user } = userHandler();
+//     const token = localStorage.getItem('token');
+//     const [selectedMeetId, setSelectedMeetId] = useState(null);
+//     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+//     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+//     const [meetToDelete, setMeetToDelete] = useState(null);
+
+//     const {
+//         clubMeets,
+//         currentPage,
+//         totalPages,
+//         loading,
+//         error,
+//         listClubMeets,
+//         currentClub,
+//         getClubById
+//     } = clubHandler();
+
+//     const [searchTerm, setSearchTerm] = useState('');
+//     const itemsPerPage = 9;
+
+//     const debouncedSearch = useCallback(
+//         debounce((searchValue) => {
+//             listClubMeets(clubId, 1, searchValue);
+//         }, 500),
+//         [clubId, listClubMeets]
+//     );
+
+//     useEffect(() => {
+//         if (!token) navigate('/login');
+//     }, [navigate, token]);
+
+//     useEffect(() => {
+//         if (clubId) {
+//             listClubMeets(clubId, currentPage, searchTerm);
+//         }
+//     }, [clubId, currentPage, searchTerm, listClubMeets]);
+
+//     useEffect(() => {
+//         if (searchTerm.trim()) {
+//             debouncedSearch(searchTerm);
+//         } else {
+//             listClubMeets(clubId, 1, '');
+//         }
+//     }, [searchTerm, debouncedSearch, clubId, listClubMeets]);
+
+    
+
+//     const handlePageChange = (newPage) => {
+//         listClubMeets(clubId, newPage, searchTerm);
+//     };
+
+//     const handleEditMeet = (meetId) => {
+//         setSelectedMeetId(meetId);
+//         setIsEditModalOpen(true);
+//     };
+
+//     const handleDeleteMeet = (meetId) => {
+//         setMeetToDelete(meetId);
+//     };
+
+//     // Função de confirmação de delete
+//     const handleConfirmDelete = (deletedMeetId) => {
+//         setMeetToDelete(null);
+//         listClubMeets(clubId, currentPage, searchTerm)
+//             .catch(error => console.error("Erro na recarga:", error));        
+//     };
+
+//     // Função para fechar modal e limpar estado
+//     const handleCloseModal = () => {
+//         setIsEditModalOpen(false);
+//         setSelectedMeetId(null);
+//     };
+
+//     const handleUpdateSuccess = () => {
+//         listClubMeets(clubId, currentPage, searchTerm);
+//         handleCloseModal();
+//     };
+
+//     if (!token) return <Navigate to="/login" replace />;
+
+//     return (
+//         <Box bg="#F5F5F5" minH="100vh">
+//             <NavBar user={user} />
+//             <MainContainer banner={currentClub?.banner} />
+
+
+
 import { Box, Container, Grid, Flex, Button, Text } from '@chakra-ui/react';
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate, Navigate, useParams } from 'react-router-dom';
@@ -28,7 +133,9 @@ const ClubPage = () => {
         totalPages,
         loading,
         error,
-        listClubMeets
+        listClubMeets,
+        currentClub,
+        getClubById
     } = clubHandler();
 
     const [searchTerm, setSearchTerm] = useState('');
@@ -41,16 +148,20 @@ const ClubPage = () => {
         [clubId, listClubMeets]
     );
 
+    // Carrega dados iniciais
     useEffect(() => {
+        const loadInitialData = async () => {
+            if (clubId) {
+                await getClubById(clubId);
+                listClubMeets(clubId, currentPage, searchTerm);
+            }
+        };
+        
         if (!token) navigate('/login');
-    }, [navigate, token]);
+        loadInitialData();
+    }, [navigate, token, clubId, getClubById, listClubMeets, currentPage, searchTerm]);
 
-    useEffect(() => {
-        if (clubId) {
-            listClubMeets(clubId, currentPage, searchTerm);
-        }
-    }, [clubId, currentPage, searchTerm, listClubMeets]);
-
+    // Atualiza busca
     useEffect(() => {
         if (searchTerm.trim()) {
             debouncedSearch(searchTerm);
@@ -72,14 +183,12 @@ const ClubPage = () => {
         setMeetToDelete(meetId);
     };
 
-    // Função de confirmação de delete
     const handleConfirmDelete = (deletedMeetId) => {
         setMeetToDelete(null);
         listClubMeets(clubId, currentPage, searchTerm)
             .catch(error => console.error("Erro na recarga:", error));        
     };
 
-    // Função para fechar modal e limpar estado
     const handleCloseModal = () => {
         setIsEditModalOpen(false);
         setSelectedMeetId(null);
@@ -95,7 +204,7 @@ const ClubPage = () => {
     return (
         <Box bg="#F5F5F5" minH="100vh">
             <NavBar user={user} />
-            <MainContainer />
+            <MainContainer banner={currentClub?.banner} />
 
             <Container maxW="980px" py={8}>
                 <Flex direction="column" gap={3}>
