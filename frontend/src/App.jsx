@@ -7,6 +7,7 @@ import LoginPage from './pages/LoginPage';
 import ClubPage from './pages/ClubPage';
 import MeetPage from './pages/MeetPage';
 import { userHandler } from './store/userStore';
+import ProfilePage from './pages/ProfilePage';
 
 function App() {
   const { initializeUser } = userHandler();
@@ -23,6 +24,7 @@ function App() {
             <Route path="/" element={<HomePage />} />
             <Route path="/register" element={<RegisterPage />} />
             <Route path="/login" element={<LoginPage />} />
+            <Route path="/profile" element={<ProfilePage />} />
             <Route path="/clubs" element={<ClubPage />} />
             <Route path="/clubs/:clubId" element={<ClubPage />} />
             <Route path="/meets/:meetId" element={<MeetPage />} />
