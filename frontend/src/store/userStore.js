@@ -50,6 +50,34 @@ export const userHandler = create((set) => ({
       set({ user: null, loading: false });
     }
   },
+
+  fetchUserProfile: async () => {
+    try {
+      set({ loadingUser: true, error: null });
+      
+      const response = await api.get("users/profile");
+      const userData = response.data.data;
+      console.log("userData", userData);
+  
+      // Atualiza localStorage e estado
+      localStorage.setItem("user", JSON.stringify(userData));
+      set({ user: userData, loadingUser: false });
+  
+      return { 
+        success: true, 
+        data: userData,
+        message: 'Perfil atualizado com sucesso' 
+      };
+  
+    } catch (error) {
+      const message = error.response?.data?.message || error.message;
+      set({ error: message, loadingUser: false });
+      return { 
+        success: false, 
+        message: message || 'Erro ao buscar perfil' 
+      };
+    }
+  },
   
   // Ações
   registerUser: async (newUser) => {

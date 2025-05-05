@@ -24,26 +24,77 @@ import {
     List,
     ListItem,
     IconButton,
-    HStack
-  } from '@chakra-ui/react';
-  import { FiEdit, FiTrash2, FiPlus } from 'react-icons/fi';
-  import { useState, useRef } from 'react';
-  
-// Dados mockados de clubes
-const mockClubs = {
-    participating: ['Clube de Leitura SP', 'Clube de Ficção Científica', 'Clube de Poesia Moderna'],
-    managing: ['Clube de Literatura Fantástica', 'Clube de Autores Contemporâneos', 'Clube de Não-Ficção']
-};
+    HStack,
+    Skeleton
+} from '@chakra-ui/react';
+import { FiEdit, FiTrash2, FiPlus } from 'react-icons/fi';
+import { useState, useRef, useEffect } from 'react';
+import { userHandler } from '../store/userStore';
+import { clubHandler } from '../store/clubStore';
   
 const ProfilePage = () => {
+    const { fetchUserProfile, user, loadingUser } = userHandler();
+    const { getClubById } =clubHandler();
     const { isOpen, onOpen, onClose } = useDisclosure();
     const cancelRef = useRef();
     
     const [userData, setUserData] = useState({
-        name: "João Silva",
-        email: "joao@exemplo.com",
+        name: user?.name || '',
+        email: user?.email || '',
         password: "********"
     });
+
+    const [memberClubsList, setMemberClubsList] = useState([]);
+    const [adminClubsList, setAdminClubsList] = useState([]);
+
+    useEffect(() => {
+        const fetchClubs = async () => {
+          if (user) {
+            try {
+              // Busca clubes que participa
+              const memberClubsData = await Promise.all(
+                user.memberClubs.map(async (clubId) => {
+                  const response = await getClubById(clubId);
+                  return response.data;
+                })
+              );
+              setMemberClubsList(memberClubsData);
+      
+              // Busca clubes que administra
+              const adminClubsData = await Promise.all(
+                user.adminClubs.map(async (clubId) => {
+                  const response = await getClubById(clubId);
+                  return response.data;
+                })
+              );
+              setAdminClubsList(adminClubsData);
+      
+            } catch (error) {
+              console.error("Erro ao buscar clubes:", error);
+            }
+          }
+        };
+      
+        fetchClubs();
+    }, [user, getClubById]);
+
+    useEffect(() => {
+        const loadData = async () => {
+            await fetchUserProfile();
+        };
+        loadData();
+    }, [fetchUserProfile]);
+
+    // Atualizar estado local quando os dados do usuário mudarem
+    useEffect(() => {
+        if (user) {
+            setUserData({
+                name: user.name,
+                email: user.email,
+                password: '********'
+            });
+        }
+    }, [user]);
   
     const handleInputChange = (e) => {
         setUserData({
@@ -52,8 +103,15 @@ const ProfilePage = () => {
         });
     };
   
-    const handleSave = () => {
-        console.log("Dados salvos:", userData);
+    const handleSave = async () => {
+        try {
+            await updateUser({
+                name: userData.name,
+                email: userData.email
+            });
+        } catch (error) {
+            console.error("Erro ao atualizar:", error);
+        }
     };
   
     const handleDeleteAccount = () => {
@@ -75,12 +133,18 @@ const ProfilePage = () => {
                 <Flex direction={['column', 'row']} gap={8} align="start">
                     {/* Seção da foto */}
                     <VStack spacing={4}>
-                    <Avatar 
-                        size="2xl" 
-                        name={userData.name} 
-                        src="https://bit.ly/dan-abramov" 
-                    />
-                    <Text fontSize="xl" fontWeight="semibold">{userData.name}</Text>
+                        <Skeleton isLoaded={!loadingUser} borderRadius="full">
+                            <Avatar 
+                                size="2xl" 
+                                name={user?.name} 
+                                src={user?.photo || ''} 
+                            />
+                        </Skeleton>
+                        <Skeleton isLoaded={!loadingUser}>
+                            <Text fontSize="xl" fontWeight="semibold">
+                                {user?.name || 'Carregando...'}
+                            </Text>
+                        </Skeleton>
                     </VStack>
         
                     {/* Abas e conteúdo */}
@@ -118,14 +182,15 @@ const ProfilePage = () => {
                                 <VStack spacing={6}>
                                 <FormControl>
                                     <FormLabel htmlFor="name" fontWeight="semibold">Nome completo</FormLabel>
-                                    <Input
-                                    id="name"
-                                    name="name"
-                                    value={userData.name}
-                                    onChange={handleInputChange}
-                                    placeholder="Nome completo"
-                                    size="lg"
-                                    />
+                                        <Input
+                                        id="name"
+                                        name="name"
+                                        value={userData.name}
+                                        onChange={handleInputChange}
+                                        placeholder="Nome completo"
+                                        size="lg"
+                                        isDisabled={loadingUser}
+                                        />
                                 </FormControl>
             
                                 <FormControl>
@@ -138,6 +203,7 @@ const ProfilePage = () => {
                                     onChange={handleInputChange}
                                     placeholder="E-mail"
                                     size="lg"
+                                    isDisabled={loadingUser}
                                     />
                                 </FormControl>
             
@@ -190,14 +256,14 @@ const ProfilePage = () => {
                                     Clubes que participo:
                                     </Text>
                                     <List spacing={4}>
-                                    {mockClubs.participating.map((club, index) => (
-                                        <ListItem key={index}>
-                                        <Text
-                                            fontSize="22px"
-                                            fontWeight="800"
-                                            color="#1A141F"
-                                        >
-                                            {club}
+                                    {memberClubsList.map((club) => (
+                                        <ListItem key={club._id}>
+                                            <Text
+                                                fontSize="22px"
+                                                fontWeight="800"
+                                                color="#1A141F"
+                                            >
+                                            {club.name}
                                         </Text>
                                         </ListItem>
                                     ))}
@@ -215,31 +281,31 @@ const ProfilePage = () => {
                                             Clubes que administro:
                                         </Text>
                                         <List spacing={4}>
-                                            {mockClubs.managing.map((club, index) => (
-                                            <ListItem key={index}>
+                                            {adminClubsList.map((club) => (
+                                            <ListItem key={club._id}>
                                                 <Flex justify="space-between" align="center">
                                                     <Text
-                                                    fontSize="22px"
-                                                    fontWeight="800"
-                                                    color="#1A141F"
-                                                    >
-                                                    {club}
+                                                        fontSize="22px"
+                                                        fontWeight="800"
+                                                        color="#1A141F"
+                                                        >
+                                                        {club.name}
                                                     </Text>
                                                     <HStack spacing={3}>
-                                                    <IconButton
-                                                        aria-label="Editar clube"
-                                                        icon={<FiEdit />}
-                                                        variant="ghost"
-                                                        colorScheme="blue"
-                                                        onClick={() => console.log('Editar clube:', club)}
-                                                    />
-                                                    <IconButton
-                                                        aria-label="Excluir clube"
-                                                        icon={<FiTrash2 />}
-                                                        variant="ghost"
-                                                        colorScheme="red"
-                                                        onClick={() => console.log('Excluir clube:', club)}
-                                                    />
+                                                        <IconButton
+                                                            aria-label="Editar clube"
+                                                            icon={<FiEdit />}
+                                                            variant="ghost"
+                                                            colorScheme="blue"
+                                                            onClick={() => console.log('Editar clube:', club)}
+                                                        />
+                                                        <IconButton
+                                                            aria-label="Excluir clube"
+                                                            icon={<FiTrash2 />}
+                                                            variant="ghost"
+                                                            colorScheme="red"
+                                                            onClick={() => console.log('Excluir clube:', club)}
+                                                        />
                                                     </HStack>
                                                 </Flex>
                                             </ListItem>
