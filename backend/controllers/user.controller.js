@@ -130,7 +130,9 @@ export const getProfile = async (req, res) => {
       name: user.name,
       isAdmin: user.isAdmin,
       email: user.email,
-      photo: user.photo
+      photo: user.photo,
+      memberClubs: user.memberClubs,
+      adminClubs: user.adminClubs
     };
 
     res.status(200).json({
