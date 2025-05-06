@@ -29,6 +29,7 @@ import {
 } from '@chakra-ui/react';
 import { FiEdit, FiTrash2 } from 'react-icons/fi';
 import { useState, useRef, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import NavBar from '../components/Navbar';
 import { userHandler } from '../store/userStore';
 import { clubHandler } from '../store/clubStore';
@@ -257,19 +258,20 @@ const ProfilePage = () => {
                                     <List spacing={4}>
                                     {memberClubsList.map((club) => (
                                         <ListItem key={club._id}>
-                                            <Text
-                                                fontSize="22px"
-                                                fontWeight="800"
-                                                color="#1A141F"
-                                                _hover={({
-                                                    color: "blue.600",
-                                                    textDecoration: "underline",
-                                                    cursor: "pointer"
-                                                })}
-                                                onClick={() => console.log("ID do clube:", club._id)}
-                                            >
-                                            {club.name}
-                                        </Text>
+                                            <Link to={`/clubs/${club._id}`}>
+                                                <Text
+                                                    fontSize="22px"
+                                                    fontWeight="800"
+                                                    color="#1A141F"
+                                                    _hover={({
+                                                        color: "blue.600",
+                                                        textDecoration: "underline",
+                                                        cursor: "pointer"
+                                                    })}
+                                                >
+                                                    {club.name}
+                                                </Text>
+                                            </Link>
                                         </ListItem>
                                     ))}
                                     </List>
@@ -289,19 +291,20 @@ const ProfilePage = () => {
                                             {adminClubsList.map((club) => (
                                             <ListItem key={club._id}>
                                                 <Flex justify="space-between" align="center">
-                                                    <Text
-                                                        fontSize="22px"
-                                                        fontWeight="800"
-                                                        color="#1A141F"
-                                                        _hover={{
-                                                            color: "blue.600",
-                                                            textDecoration: "underline",
-                                                            cursor: "pointer"
-                                                          }}
-                                                          onClick={() => console.log("ID do clube administrado:", club._id)}
+                                                    <Link to={`/clubs/${club._id}`}>
+                                                        <Text
+                                                            fontSize="22px"
+                                                            fontWeight="800"
+                                                            color="#1A141F"
+                                                            _hover={{
+                                                                color: "blue.600",
+                                                                textDecoration: "underline",
+                                                                cursor: "pointer"
+                                                            }}
                                                         >
-                                                        {club.name}
-                                                    </Text>
+                                                            {club.name}
+                                                        </Text>
+                                                    </Link>
                                                     <HStack spacing={3}>
                                                         <IconButton
                                                             aria-label="Editar clube"
