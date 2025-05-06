@@ -39,7 +39,7 @@ export const clubHandler = create((set, get) => ({
         formData.append('banner', bannerFile);
       }
 
-      const { data } = await api.post('/', formData, {
+      const { data } = await api.post('/create', formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }

@@ -31,6 +31,7 @@ import { FiEdit, FiTrash2 } from 'react-icons/fi';
 import { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import NavBar from '../components/Navbar';
+import CreateClubModal from '../components/CreateClubModal';
 import { userHandler } from '../store/userStore';
 import { clubHandler } from '../store/clubStore';
 
@@ -39,7 +40,16 @@ const PHOTO_PATH = 'http://localhost:5000/../uploads/users/';
 const ProfilePage = () => {
     const { fetchUserProfile, user, loadingUser } = userHandler();
     const { getClubById } =clubHandler();
-    const { isOpen, onOpen, onClose } = useDisclosure();
+    const { 
+        isOpen: isCreateClubOpen, 
+        onOpen: onCreateClubOpen, 
+        onClose: onCreateClubClose 
+    } = useDisclosure();
+    const { 
+        isOpen: isDeleteDialogOpen, 
+        onOpen: onDeleteDialogOpen, 
+        onClose: onDeleteDialogClose 
+      } = useDisclosure();
     const cancelRef = useRef();
     
     const [userData, setUserData] = useState({
@@ -120,8 +130,20 @@ const ProfilePage = () => {
   
     const handleDeleteAccount = () => {
         console.log("Conta excluída");
-        onClose();
+        onDeleteDialogClose();
     };
+
+    const handleCreateClub = async (clubData) => {
+        try {
+          // Aqui você deve adicionar a lógica para enviar para a API
+          console.log('Dados do novo clube:', clubData);
+          // Exemplo:
+          // await api.post('/clubs', clubData);
+          // Atualizar a lista de clubes
+        } catch (error) {
+          console.error('Erro ao criar clube:', error);
+        }
+      };
   
     return (
         <Box minH="100vh" bg="gray.50">
@@ -234,7 +256,7 @@ const ProfilePage = () => {
                                     colorScheme="red" 
                                     variant="outline"
                                     flex={1}
-                                    onClick={onOpen}
+                                    onClick={onDeleteDialogOpen}
                                     >
                                     Excluir Perfil
                                     </Button>
@@ -329,7 +351,7 @@ const ProfilePage = () => {
                                         <Button
                                             colorScheme="blue"
                                             mt={8}
-                                            onClick={() => console.log('Criar novo clube')}
+                                            onClick={onCreateClubOpen}
                                         >
                                             Criar Clube
                                         </Button>
@@ -341,12 +363,18 @@ const ProfilePage = () => {
                     </VStack>
                 </Flex>
             </Container>
+
+            <CreateClubModal 
+                isOpen={isCreateClubOpen}
+                onClose={onCreateClubClose}
+                onCreate={handleCreateClub}
+            />
     
             {/* Diálogo de confirmação para exclusão */}
             <AlertDialog
-                isOpen={isOpen}
+                isOpen={isDeleteDialogOpen}
                 leastDestructiveRef={cancelRef}
-                onClose={onClose}
+                onClose={onDeleteDialogClose}
             >
                 <AlertDialogOverlay>
                     <AlertDialogContent>
@@ -359,7 +387,7 @@ const ProfilePage = () => {
                     </AlertDialogBody>
         
                     <AlertDialogFooter>
-                        <Button ref={cancelRef} onClick={onClose}>
+                        <Button ref={cancelRef} onClick={onDeleteDialogClose}>
                         Cancelar
                         </Button>
                         <Button colorScheme="red" onClick={handleDeleteAccount} ml={3}>
