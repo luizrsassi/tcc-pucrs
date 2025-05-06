@@ -57,7 +57,6 @@ export const userHandler = create((set) => ({
       
       const response = await api.get("users/profile");
       const userData = response.data.data;
-      console.log("userData", userData);
   
       // Atualiza localStorage e estado
       localStorage.setItem("user", JSON.stringify(userData));

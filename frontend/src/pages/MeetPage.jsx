@@ -17,6 +17,8 @@ import {
   import { userHandler } from '../store/userStore';
   import CommentSection from '../components/CommentSection';
   import NavBar from '../components/Navbar';
+
+  const PHOTO_PATH = 'http://localhost:5000/../uploads/users/';
   
   const MeetPage = () => {
     const { meetId } = useParams();
@@ -160,7 +162,7 @@ import {
                   <Flex align="center" gap={3}>
                     <Avatar
                       name={currentMeet.organizer?.name}
-                      src={currentMeet.organizer?.photo}
+                      src={PHOTO_PATH + `${currentMeet.organizer?.photo}`}
                       size="md"
                     />
                     <Text fontWeight="500">

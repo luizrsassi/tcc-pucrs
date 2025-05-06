@@ -27,10 +27,13 @@ import {
     HStack,
     Skeleton
 } from '@chakra-ui/react';
-import { FiEdit, FiTrash2, FiPlus } from 'react-icons/fi';
+import { FiEdit, FiTrash2 } from 'react-icons/fi';
 import { useState, useRef, useEffect } from 'react';
+import NavBar from '../components/Navbar';
 import { userHandler } from '../store/userStore';
 import { clubHandler } from '../store/clubStore';
+
+const PHOTO_PATH = 'http://localhost:5000/../uploads/users/';
   
 const ProfilePage = () => {
     const { fetchUserProfile, user, loadingUser } = userHandler();
@@ -121,12 +124,8 @@ const ProfilePage = () => {
   
     return (
         <Box minH="100vh" bg="gray.50">
-            {/* Navbar */}
-            <Box bg="blue.600" p={4} color="white">
-            <Container maxW="container.lg">
-                <Text fontSize="2xl" fontWeight="bold">Meu Perfil</Text>
-            </Container>
-            </Box>
+            
+            <NavBar />
     
             {/* Conteúdo principal */}
             <Container maxW="container.lg" py={8}>
@@ -137,7 +136,7 @@ const ProfilePage = () => {
                             <Avatar 
                                 size="2xl" 
                                 name={user?.name} 
-                                src={user?.photo || ''} 
+                                src={PHOTO_PATH + `${user.photo}`} 
                             />
                         </Skeleton>
                         <Skeleton isLoaded={!loadingUser}>
@@ -262,6 +261,12 @@ const ProfilePage = () => {
                                                 fontSize="22px"
                                                 fontWeight="800"
                                                 color="#1A141F"
+                                                _hover={({
+                                                    color: "blue.600",
+                                                    textDecoration: "underline",
+                                                    cursor: "pointer"
+                                                })}
+                                                onClick={() => console.log("ID do clube:", club._id)}
                                             >
                                             {club.name}
                                         </Text>
@@ -288,6 +293,12 @@ const ProfilePage = () => {
                                                         fontSize="22px"
                                                         fontWeight="800"
                                                         color="#1A141F"
+                                                        _hover={{
+                                                            color: "blue.600",
+                                                            textDecoration: "underline",
+                                                            cursor: "pointer"
+                                                          }}
+                                                          onClick={() => console.log("ID do clube administrado:", club._id)}
                                                         >
                                                         {club.name}
                                                     </Text>
