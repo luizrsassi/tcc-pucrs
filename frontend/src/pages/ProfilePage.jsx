@@ -32,14 +32,15 @@ import { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import NavBar from '../components/Navbar';
 import CreateClubModal from '../components/CreateClubModal';
-// import EditClubModal from '../components/EditClubModal';
+import EditClubModal from '../components/EditClubModal';
+import DeleteClubModal from '../components/DeleteClubModal';
 import { userHandler } from '../store/userStore';
 import { clubHandler } from '../store/clubStore';
 
 const PHOTO_PATH = 'http://localhost:5000/../uploads/users/';
   
 const ProfilePage = () => {
-    const { fetchUserProfile, user, loadingUser } = userHandler();
+    const { user, loadingUser } = userHandler();
     const { getClubById } =clubHandler();
     const { 
         isOpen: isCreateClubOpen, 
@@ -51,6 +52,14 @@ const ProfilePage = () => {
         onOpen: onDeleteDialogOpen, 
         onClose: onDeleteDialogClose 
       } = useDisclosure();
+
+    const [clubToDelete, setClubToDelete] = useState(null);
+    const { 
+        isOpen: isDeleteClubOpen, 
+        onOpen: onDeleteClubOpen, 
+        onClose: onDeleteClubClose 
+    } = useDisclosure();
+
     const cancelRef = useRef();
     
     const [userData, setUserData] = useState({
@@ -61,47 +70,56 @@ const ProfilePage = () => {
 
     const [memberClubsList, setMemberClubsList] = useState([]);
     const [adminClubsList, setAdminClubsList] = useState([]);
+
+    const [selectedClub, setSelectedClub] = useState(null);
+
+    const { 
+        isOpen: isEditModalOpen, 
+        onOpen: onEditModalOpen, 
+        onClose: onEditModalClose 
+    } = useDisclosure();
+
     useEffect(() => {
-    let isMounted = true;
+        let isMounted = true;
 
-    const fetchClubs = async () => {
-        if (!user) return;
+        const fetchClubs = async () => {
+            if (!user) return;
 
-        const fetchClubsData = async (clubIds) => {
-        const validIds = (clubIds || []).map(id => id?.toString()).filter(id => 
-            id && id.length === 24
-        );
+            const fetchClubsData = async (clubIds) => {
+            const validIds = (clubIds || []).map(id => id?.toString()).filter(id => 
+                id && id.length === 24
+            );
 
-        const results = await Promise.all(
-            validIds.map(async (id) => {
-            try {
-                if (id !== '681e425464d669a6dfc0b219'){
-                    const club = await getClubById(id);
-                    return club.data || null;
+            const results = await Promise.all(
+                validIds.map(async (id) => {
+                try {
+                    if (id !== '681e425464d669a6dfc0b219'){
+                        const club = await getClubById(id);
+                        return club.data || null;
+                    }
+                    
+                } catch (error) {
+                    console.error(`Erro no clube ${id}:`, error.response?.data || error.message);
+                    return null;
                 }
-                
-            } catch (error) {
-                console.error(`Erro no clube ${id}:`, error.response?.data || error.message);
-                return null;
-            }
-            })
-        );
-        return results.filter(club => club?._id);
+                })
+            );
+            return results.filter(club => club?._id);
         };
 
         try {
-        const [memberClubs, adminClubs] = await Promise.all([
-            fetchClubsData(user.memberClubs),
-            fetchClubsData(user.adminClubs)
-        ]);
+            const [memberClubs, adminClubs] = await Promise.all([
+                fetchClubsData(user.memberClubs),
+                fetchClubsData(user.adminClubs)
+            ]);
         
-        if (isMounted) {
-            setMemberClubsList(memberClubs);
-            setAdminClubsList(adminClubs);
-        }
+            if (isMounted) {
+                setMemberClubsList(memberClubs);
+                setAdminClubsList(adminClubs);
+            }
         
         } catch (error) {
-        console.error("Erro geral:", error);
+            console.error("Erro geral:", error);
         }
     };
 
@@ -153,7 +171,17 @@ const ProfilePage = () => {
         } catch (error) {
           console.error('Erro ao criar clube:', error);
         }
-      };
+    };
+
+    const handleEditClick = (club) => {
+        setSelectedClub(club);
+        onEditModalOpen();
+    };
+
+    const handleDeleteClick = (club) => {
+        setClubToDelete(club);
+        onDeleteClubOpen();
+    };
   
     return (
         <Box minH="100vh" bg="gray.50">
@@ -343,14 +371,14 @@ const ProfilePage = () => {
                                                             icon={<FiEdit />}
                                                             variant="ghost"
                                                             colorScheme="blue"
-                                                            onClick={() => console.log('Editar clube:', club)}
+                                                            onClick={() => handleEditClick(club)}
                                                         />
                                                         <IconButton
                                                             aria-label="Excluir clube"
                                                             icon={<FiTrash2 />}
                                                             variant="ghost"
                                                             colorScheme="red"
-                                                            onClick={() => console.log('Excluir clube:', club)}
+                                                            onClick={() => handleDeleteClick(club)}
                                                         />
                                                     </HStack>
                                                 </Flex>
@@ -378,6 +406,24 @@ const ProfilePage = () => {
                 isOpen={isCreateClubOpen}
                 onClose={onCreateClubClose}
                 onCreate={handleCreateClub}
+            />
+
+            <EditClubModal 
+                isOpen={isEditModalOpen}
+                onClose={() => {
+                    onEditModalClose();
+                    setSelectedClub(null);
+                }}
+                club={selectedClub}
+            />
+
+            <DeleteClubModal 
+                isOpen={isDeleteClubOpen}
+                onClose={() => {
+                onDeleteClubClose();
+                setClubToDelete(null);
+                }}
+                club={clubToDelete}
             />
     
             {/* Diálogo de confirmação para exclusão */}
