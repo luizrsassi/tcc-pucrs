@@ -140,34 +140,65 @@ export const clubHandler = create((set, get) => ({
       set({ loading: true, error: null });
       
       const formData = new FormData();
+      
+      // Adiciona campos textuais
       if (updateData.name) formData.append('name', updateData.name);
       if (updateData.description) formData.append('description', updateData.description);
-      if (updateData.rules) formData.append('rules', updateData.rules);
-      if (bannerFile) formData.append('banner', bannerFile);
-
-      const { data } = await api.put(`/${clubId}`, formData, {
+      
+      // Adiciona regras como array
+      if (updateData.rules) {
+        updateData.rules.forEach((rule, index) => {
+          formData.append(`rules[${index}]`, rule);
+        });
+      }
+      
+      // Adiciona arquivo de banner se existir
+      if (bannerFile) {
+        formData.append('banner', bannerFile);
+      }
+  
+      const { data } = await api.put(`/update/${clubId}`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
       });
-
+  
       set(state => ({
         clubs: state.clubs.map(club => 
-          club._id === clubId ? data.club : club
+          club._id === clubId ? data.data : club
         ),
-        currentClub: data.club
+        currentClub: data.data
       }));
-
+  
       return { 
         success: true, 
-        data: data.club,
-        message: 'Clube atualizado com sucesso!' 
+        data: data.data,
+        message: data.message 
       };
       
     } catch (error) {
       const message = error.response?.data?.message || error.message;
+      let errorCode = null;
+      
+      // Tratamento específico de erros
+      if (error.response) {
+        errorCode = error.response.status;
+        switch (errorCode) {
+          case 403:
+            message = 'Você não tem permissão para editar este clube';
+            break;
+          case 404:
+            message = 'Clube não encontrado';
+            break;
+        }
+      }
+      
       set({ error: message });
-      return { success: false, message };
+      return { 
+        success: false, 
+        message,
+        errorCode 
+      };
     } finally {
       set({ loading: false });
     }
@@ -231,7 +262,7 @@ export const clubHandler = create((set, get) => ({
   getClubById: async (clubId) => {
     try {
         set({ loading: true });
-        const response = await api.get(`/${clubId}`);
+        const response = await api.get(`${clubId}`);
         set({ currentClub: response.data.data });
         return response.data;
       } catch (error) {

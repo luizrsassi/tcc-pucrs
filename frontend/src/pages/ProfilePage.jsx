@@ -32,6 +32,7 @@ import { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import NavBar from '../components/Navbar';
 import CreateClubModal from '../components/CreateClubModal';
+// import EditClubModal from '../components/EditClubModal';
 import { userHandler } from '../store/userStore';
 import { clubHandler } from '../store/clubStore';
 
@@ -60,44 +61,53 @@ const ProfilePage = () => {
 
     const [memberClubsList, setMemberClubsList] = useState([]);
     const [adminClubsList, setAdminClubsList] = useState([]);
-
     useEffect(() => {
-        const fetchClubs = async () => {
-          if (user) {
+    let isMounted = true;
+
+    const fetchClubs = async () => {
+        if (!user) return;
+
+        const fetchClubsData = async (clubIds) => {
+        const validIds = (clubIds || []).map(id => id?.toString()).filter(id => 
+            id && id.length === 24
+        );
+
+        const results = await Promise.all(
+            validIds.map(async (id) => {
             try {
-              // Busca clubes que participa
-              const memberClubsData = await Promise.all(
-                user.memberClubs.map(async (clubId) => {
-                  const response = await getClubById(clubId);
-                  return response.data;
-                })
-              );
-              setMemberClubsList(memberClubsData);
-      
-              // Busca clubes que administra
-              const adminClubsData = await Promise.all(
-                user.adminClubs.map(async (clubId) => {
-                  const response = await getClubById(clubId);
-                  return response.data;
-                })
-              );
-              setAdminClubsList(adminClubsData);
-      
+                if (id !== '681e425464d669a6dfc0b219'){
+                    const club = await getClubById(id);
+                    return club.data || null;
+                }
+                
             } catch (error) {
-              console.error("Erro ao buscar clubes:", error);
+                console.error(`Erro no clube ${id}:`, error.response?.data || error.message);
+                return null;
             }
-          }
+            })
+        );
+        return results.filter(club => club?._id);
         };
-      
-        fetchClubs();
-    }, [user, getClubById]);
 
-    useEffect(() => {
-        const loadData = async () => {
-            await fetchUserProfile();
-        };
-        loadData();
-    }, [fetchUserProfile]);
+        try {
+        const [memberClubs, adminClubs] = await Promise.all([
+            fetchClubsData(user.memberClubs),
+            fetchClubsData(user.adminClubs)
+        ]);
+        
+        if (isMounted) {
+            setMemberClubsList(memberClubs);
+            setAdminClubsList(adminClubs);
+        }
+        
+        } catch (error) {
+        console.error("Erro geral:", error);
+        }
+    };
+
+    fetchClubs();
+    return () => { isMounted = false };
+    }, [user, getClubById]);
 
     // Atualizar estado local quando os dados do usuário mudarem
     useEffect(() => {
@@ -270,10 +280,10 @@ const ProfilePage = () => {
                                 {/* Clubes que participa */}
                                 <Box w="full">
                                     <Text
-                                    fontSize="40px"
-                                    color="#273269"
-                                    fontWeight="bold"
-                                    mb={6}
+                                        fontSize="40px"
+                                        color="#273269"
+                                        fontWeight="bold"
+                                        mb={6}
                                     >
                                     Clubes que participo:
                                     </Text>
@@ -291,7 +301,7 @@ const ProfilePage = () => {
                                                         cursor: "pointer"
                                                     })}
                                                 >
-                                                    {club.name}
+                                                    {club?.name || 'sem nome'}
                                                 </Text>
                                             </Link>
                                         </ListItem>
