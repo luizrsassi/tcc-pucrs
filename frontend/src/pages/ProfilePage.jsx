@@ -93,11 +93,8 @@ const ProfilePage = () => {
             const results = await Promise.all(
                 validIds.map(async (id) => {
                 try {
-                    if (id !== '681e425464d669a6dfc0b219'){
-                        const club = await getClubById(id);
-                        return club.data || null;
-                    }
-                    
+                    const club = await getClubById(id);
+                    return club.data || null;
                 } catch (error) {
                     console.error(`Erro no clube ${id}:`, error.response?.data || error.message);
                     return null;
@@ -424,6 +421,10 @@ const ProfilePage = () => {
                 setClubToDelete(null);
                 }}
                 club={clubToDelete}
+                onSuccess={() => {
+                    setMemberClubsList([]);
+                    setAdminClubsList([]);
+                }}
             />
     
             {/* Diálogo de confirmação para exclusão */}

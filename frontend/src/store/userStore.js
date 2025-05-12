@@ -77,8 +77,7 @@ export const userHandler = create((set) => ({
       };
     }
   },
-  
-  // Ações
+
   registerUser: async (newUser) => {
     try {
       set({ loading: true, error: null });
@@ -122,7 +121,6 @@ export const userHandler = create((set) => ({
     }
   },
 
-  // ========== NOVO MÉTODO ========== //
   updateUser: async (updatedData) => {
     try {
       set({ loading: true });
@@ -148,33 +146,6 @@ export const userHandler = create((set) => ({
     }
   },
 
-  // loginUser: async (credentials) => {
-  //   try {
-  //     set({ loading: true, error: null });
-
-  //     // Validação
-  //     if (!credentials.email || !credentials.password) {
-  //       throw new Error("Preencha todos os campos");
-  //     }
-
-  //     // Requisição com Axios
-  //     const { data } = await api.post("/users/login", credentials);
-      
-  //     // Armazenar token e atualizar estado
-  //     localStorage.setItem("token", data.token);
-  //     set({ user: data.user, error: null });
-
-  //     return { success: true, message: "Login realizado com sucesso!" };
-
-  //   } catch (error) {
-  //     const message = error.response?.data?.error || error.message;
-  //     set({ error: message });
-  //     return { success: false, message };
-  //   } finally {
-  //     set({ loading: false });
-  //   }
-  // },
-  // ========== MÉTODOS MODIFICADOS ========== //
   loginUser: async (credentials) => {
     try {
       set({ loading: true, error: null });
@@ -217,4 +188,15 @@ export const userHandler = create((set) => ({
       set({ loading: false });
     }
   },
+
+  removeClubFromUser: (clubId) => {
+    set(state => ({
+      user: {
+        ...state.user,
+        memberClubs: state.user.memberClubs.filter(id => id !== clubId),
+        adminClubs: state.user.adminClubs.filter(id => id !== clubId)
+      }
+    }));
+  }
+
 }));

@@ -208,23 +208,16 @@ export const clubHandler = create((set, get) => ({
   deleteClub: async (clubId) => {
     try {
       set({ loading: true, error: null });
+      const response = await api.delete(`/delete/${clubId}`);
       
-      await api.delete(`/${clubId}`);
-
-      set(state => ({
-        clubs: state.clubs.filter(club => club._id !== clubId),
-        currentClub: null
-      }));
-
-      return { 
-        success: true, 
-        message: 'Clube excluído com sucesso!' 
-      };
+      if (response.data.success) {
+        return response.data;
+      }
+      throw new Error(response.data.message || 'Erro ao excluir clube');
       
     } catch (error) {
-      const message = error.response?.data?.message || error.message;
-      set({ error: message });
-      return { success: false, message };
+      set({ error: error.message });
+      throw error;
     } finally {
       set({ loading: false });
     }
