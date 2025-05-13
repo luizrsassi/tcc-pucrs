@@ -71,7 +71,9 @@ const ProfilePage = () => {
     const [userData, setUserData] = useState({
         name: user?.name || '',
         email: user?.email || '',
-        password: "********"
+        currentPassword: '',
+        newPassword: '',
+        confirmPassword: ''
     });
 
     const [memberClubsList, setMemberClubsList] = useState([]);
@@ -136,7 +138,9 @@ const ProfilePage = () => {
             setUserData({
                 name: user.name,
                 email: user.email,
-                password: '********'
+                currentPassword: '',
+                newPassword: '',
+                confirmPassword: ''
             });
         }
     }, [user]);
@@ -363,15 +367,41 @@ const ProfilePage = () => {
                                 </FormControl>
             
                                 <FormControl>
-                                    <FormLabel htmlFor="password" fontWeight="semibold">Senha</FormLabel>
+                                    <FormLabel htmlFor="currentPassword" fontWeight="semibold">Senha Atual</FormLabel>
                                     <Input
-                                    id="password"
-                                    name="password"
-                                    type="password"
-                                    value={userData.password}
-                                    onChange={handleInputChange}
-                                    placeholder="Senha"
-                                    size="lg"
+                                        id="currentPassword"
+                                        name="currentPassword"
+                                        type="password"
+                                        value={userData.currentPassword}
+                                        onChange={handleInputChange}
+                                        placeholder="Digite sua senha atual"
+                                        size="lg"
+                                    />
+                                </FormControl>
+
+                                <FormControl>
+                                    <FormLabel htmlFor="newPassword" fontWeight="semibold">Nova Senha</FormLabel>
+                                    <Input
+                                        id="newPassword"
+                                        name="newPassword"
+                                        type="password"
+                                        value={userData.newPassword}
+                                        onChange={handleInputChange}
+                                        placeholder="Digite a nova senha"
+                                        size="lg"
+                                    />
+                                </FormControl>
+
+                                <FormControl>
+                                    <FormLabel htmlFor="confirmPassword" fontWeight="semibold">Confirme a Nova Senha</FormLabel>
+                                    <Input
+                                        id="confirmPassword"
+                                        name="confirmPassword"
+                                        type="password"
+                                        value={userData.confirmPassword}
+                                        onChange={handleInputChange}
+                                        placeholder="Confirme a nova senha"
+                                        size="lg"
                                     />
                                 </FormControl>
             
