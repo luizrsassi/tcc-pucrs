@@ -25,7 +25,9 @@ import {
     ListItem,
     IconButton,
     HStack,
-    Skeleton
+    Skeleton,
+    useToast,
+    Spinner
 } from '@chakra-ui/react';
 import { FiEdit, FiTrash2 } from 'react-icons/fi';
 import { useState, useRef, useEffect } from 'react';
@@ -40,6 +42,10 @@ import { clubHandler } from '../store/clubStore';
 const PHOTO_PATH = 'http://localhost:5000/../uploads/users/';
   
 const ProfilePage = () => {
+    const toast = useToast();
+    const fileInputRef = useRef();
+    const [isUpdatingPhoto, setIsUpdatingPhoto] = useState(false);
+    const [tempPhoto, setTempPhoto] = useState(null);
     const { user, loadingUser } = userHandler();
     const { getClubById } =clubHandler();
     const { 
@@ -51,7 +57,7 @@ const ProfilePage = () => {
         isOpen: isDeleteDialogOpen, 
         onOpen: onDeleteDialogOpen, 
         onClose: onDeleteDialogClose 
-      } = useDisclosure();
+    } = useDisclosure();
 
     const [clubToDelete, setClubToDelete] = useState(null);
     const { 
@@ -144,10 +150,30 @@ const ProfilePage = () => {
   
     const handleSave = async () => {
         try {
-            await updateUser({
+            const updateData = {
                 name: userData.name,
                 email: userData.email
+            };
+
+            // Se houver nova foto, adicione ao FormData
+            if (tempPhoto) {
+                const formData = new FormData();
+                formData.append('photo', tempPhoto.file);
+                
+                // Aqui você faria o upload real da foto
+                // await api.uploadPhoto(formData);
+            }
+
+            // await updateUser(updateData);
+            toast({
+                title: 'Alterações salvas!',
+                status: 'success',
+                duration: 3000,
+                isClosable: true,
             });
+
+            setTempPhoto(null); // Limpa a foto temporária após salvar
+
         } catch (error) {
             console.error("Erro ao atualizar:", error);
         }
@@ -179,7 +205,34 @@ const ProfilePage = () => {
         setClubToDelete(club);
         onDeleteClubOpen();
     };
+
+    const simulatePhotoUpload = async (file) => {
+        return new Promise(resolve => setTimeout(() => resolve({
+            success: true,
+            photoUrl: URL.createObjectURL(file)
+        }), 1500));
+    };
   
+    const handleFileChange = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        // Cria URL temporária para pré-visualização
+        const tempUrl = URL.createObjectURL(file);
+        setTempPhoto({
+            file,    // Armazena o arquivo original
+            url: tempUrl // Armazena a URL temporária
+        });
+
+        // Atualiza visualização imediatamente
+        userHandler.getState().setUser({
+            ...user,
+            photo: tempUrl
+        });
+
+        e.target.value = '';
+    };
+
     return (
         <Box minH="100vh" bg="gray.50">
             
@@ -191,12 +244,57 @@ const ProfilePage = () => {
                     {/* Seção da foto */}
                     <VStack spacing={4}>
                         <Skeleton isLoaded={!loadingUser} borderRadius="full">
-                            <Avatar 
-                                size="2xl" 
-                                name={user?.name} 
-                                src={PHOTO_PATH + `${user.photo}`} 
-                            />
+                            <Box
+                                position="relative"
+                                cursor="pointer"
+                                onClick={() => fileInputRef.current.click()}
+                                _hover={{
+                                    '& > div:last-child': {
+                                        opacity: 1
+                                    }
+                                }}
+                            >
+                                <Avatar 
+                                    size="2xl" 
+                                    name={user?.name} 
+                                    src={tempPhoto ? tempPhoto.url : (user?.photo ? PHOTO_PATH + user.photo : '')}
+                                />
+                                
+                                {/* OVERLAY DE HOVER */}
+                                <Box
+                                    position="absolute"
+                                    top="0"
+                                    left="0"
+                                    right="0"
+                                    bottom="0"
+                                    bg="blackAlpha.600"
+                                    borderRadius="full"
+                                    opacity="0"
+                                    transition="opacity 0.2s"
+                                    display="flex"
+                                    alignItems="center"
+                                    justifyContent="center"
+                                >
+                                    {isUpdatingPhoto ? (
+                                        <Spinner color="white" />
+                                    ) : (
+                                        <Text color="white" fontWeight="bold">
+                                            Alterar Foto
+                                        </Text>
+                                    )}
+                                </Box>
+                            </Box>
                         </Skeleton>
+                        
+                        {/* INPUT DE ARQUIVO OCULTO */}
+                        <Input
+                            type="file"
+                            accept="image/*"
+                            hidden
+                            ref={fileInputRef}
+                            onChange={handleFileChange}
+                        />
+
                         <Skeleton isLoaded={!loadingUser}>
                             <Text fontSize="xl" fontWeight="semibold">
                                 {user?.name || 'Carregando...'}
