@@ -137,7 +137,20 @@ export const deleteClub = async (req, res) => {
         }
 
         const bannerUrl = club.banner;
-        
+
+        if (bannerUrl) {
+            const filename = bannerUrl.split('/').pop();
+            const filePath = path.join(uploadDir, filename);
+            console.log(filePath);
+            if (fs.existsSync(filePath)) {
+                try {
+                    await fs.promises.unlink(filePath);
+                } catch (unlinkError) {
+                    console.error('Erro ao excluir banner:', unlinkError);
+                }
+            }
+        };
+
         await Club.deleteOne({ _id: id }).session(session);
 
         await User.updateMany(
@@ -147,19 +160,6 @@ export const deleteClub = async (req, res) => {
         );
 
         await session.commitTransaction();
-
-        if (bannerUrl) {
-            const filename = bannerUrl.split('/').pop();
-            const filePath = path.join(uploadDir, filename);
-            
-            if (fs.existsSync(filePath)) {
-                try {
-                    await fs.promises.unlink(filePath);
-                } catch (unlinkError) {
-                    console.error('Erro ao excluir banner:', unlinkError);
-                }
-            }
-        }
 
         return res.status(200).json({
             success: true,
