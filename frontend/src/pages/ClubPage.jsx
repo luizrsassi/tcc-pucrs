@@ -32,7 +32,8 @@ const ClubPage = () => {
         listClubMeets,
         currentClub,
         getClubById,
-        addMember
+        addMember,
+        leaveClub
     } = clubHandler();
 
     const [searchTerm, setSearchTerm] = useState('');
@@ -123,8 +124,9 @@ const ClubPage = () => {
     };
 
     const handleLeaveClub = async () => {
-        // const result = await leaveClub(clubId); // Supondo que leaveClub existe no clubHandler
-        console.log("Você saiu do clube");
+        user._id = user._id || user.id;
+        if (user.id) delete user.id;
+        const result = await leaveClub(clubId, user._id);
         if (result.success) {
             toast({
                 title: 'Sucesso!',

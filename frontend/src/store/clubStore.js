@@ -236,6 +236,23 @@ export const clubHandler = create((set, get) => ({
     }
   },
 
+  leaveClub: async (clubId, memberId) => {
+    try {
+      set({ loading: true });
+      const { data } = await api.delete(`/${clubId}/members`, {
+        data: { memberId }
+      });
+      return { success: true, data };
+    } catch (error) {
+      return { 
+        success: false, 
+        message: error.response?.data?.message || error.message 
+      };
+    } finally {
+      set({ loading: false });
+    }
+  },
+
   getClubById: async (clubId) => {
     try {
         set({ loading: true });

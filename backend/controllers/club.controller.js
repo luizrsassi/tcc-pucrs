@@ -543,7 +543,7 @@ export const removeMember = async (req, res) => {
         }
 
         const club = await Club.findById(clubId)
-            .populate('admin', '_id')
+            .populate('_id')
             .session(session);
 
         if (!club) {
@@ -588,7 +588,7 @@ export const removeMember = async (req, res) => {
                 runValidators: true,
                 session
             }
-        ).populate('members', 'username profilePhoto');
+        ).populate('members', 'name photo');
 
         await User.findByIdAndUpdate(
             memberId,
