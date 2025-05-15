@@ -226,27 +226,11 @@ export const clubHandler = create((set, get) => ({
   // Ação para adicionar membro
   addMember: async (clubId, memberId) => {
     try {
-      set({ loading: true, error: null });
-      
-      const { data } = await api.post(`/${clubId}/members`, { memberId });
-
-      set(state => ({
-        clubs: state.clubs.map(club => 
-          club._id === clubId ? data.club : club
-        ),
-        currentClub: data.club
-      }));
-
-      return { 
-        success: true, 
-        data: data.club,
-        message: 'Membro adicionado com sucesso!' 
-      };
-      
+      set({ loading: true });
+      const { data } = await api.patch(`/${clubId}/members`, { memberId });
+      return { success: true, data };
     } catch (error) {
-      const message = error.response?.data?.message || error.message;
-      set({ error: message });
-      return { success: false, message };
+      return { success: false, message: error.response?.data?.message || error.message };
     } finally {
       set({ loading: false });
     }

@@ -31,7 +31,8 @@ const ClubPage = () => {
         error,
         listClubMeets,
         currentClub,
-        getClubById
+        getClubById,
+        addMember
     } = clubHandler();
 
     const [searchTerm, setSearchTerm] = useState('');
@@ -96,28 +97,28 @@ const ClubPage = () => {
     };
 
     const handleJoinClub = async () => {
-        // const result = await joinClub(clubId);
+        user._id = user._id || user.id;
+        if (user.id) delete user.id;
+        const result = await addMember(clubId, user._id);
         
         if (result.success) {
-        toast({
+            toast({
             title: 'Sucesso!',
-            description: 'Você ingressou no clube',
+            description: 'Você ingressou no clube com sucesso',
             status: 'success',
             duration: 3000,
             isClosable: true,
-        });
-        // Atualiza os dados do clube
-        await getClubById(clubId);
-        // Atualiza os dados do usuário se necessário
-        userHandler.getState().fetchUser(); 
+            });
+            await getClubById(clubId);
+            userHandler.getState().fetchUserProfile();
         } else {
-        toast({
+            toast({
             title: 'Erro',
             description: result.message,
             status: 'error',
             duration: 5000,
             isClosable: true,
-        });
+            });
         }
     };
 

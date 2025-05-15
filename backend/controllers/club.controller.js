@@ -441,8 +441,6 @@ export const addMember = async (req, res) => {
 
         const { clubId } = req.params;
         const { memberId } = req.body;
-        const adminId = req.user._id;
-
         // Validação do ID do membro
         if (!mongoose.Types.ObjectId.isValid(memberId)) {
             return res.status(400).json({
@@ -453,8 +451,7 @@ export const addMember = async (req, res) => {
 
         // Busca o clube com verificação de admin
         const club = await Club.findOne({
-            _id: clubId,
-            admin: adminId
+            _id: clubId
         }).session(session);
 
         if (!club) {
@@ -493,7 +490,7 @@ export const addMember = async (req, res) => {
                 runValidators: true,
                 session 
             }
-        ).populate('members', 'username email avatar');
+        ).populate('members', 'name email');
 
         // Atualiza o usuário adicionado
         await User.findByIdAndUpdate(
