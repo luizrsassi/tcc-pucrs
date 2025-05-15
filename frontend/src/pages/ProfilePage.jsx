@@ -31,7 +31,7 @@ import {
 } from '@chakra-ui/react';
 import { FiEdit, FiTrash2 } from 'react-icons/fi';
 import { useState, useRef, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import NavBar from '../components/Navbar';
 import CreateClubModal from '../components/CreateClubModal';
 import EditClubModal from '../components/EditClubModal';
@@ -40,14 +40,16 @@ import { userHandler } from '../store/userStore';
 import { clubHandler } from '../store/clubStore';
 
 const PHOTO_PATH = 'http://localhost:5000/../uploads/users/';
-  
+
 const ProfilePage = () => {
     const toast = useToast();
     const fileInputRef = useRef();
     const [isUpdatingPhoto, setIsUpdatingPhoto] = useState(false);
     const [tempPhoto, setTempPhoto] = useState(null);
-    const { user, loadingUser, updateUser } = userHandler();
+    const { user, loadingUser, updateUser, deleteUser } = userHandler();
     const { getClubById } =clubHandler();
+
+    const navigate = useNavigate();
 
     const { 
         isOpen: isCreateClubOpen, 
@@ -247,8 +249,28 @@ const ProfilePage = () => {
             });
         }
     };
-    const handleDeleteAccount = () => {
-        console.log("Conta excluída");
+    const handleDeleteAccount = async () => {
+        user._id = user._id || user.id;
+        if (user.id) delete user.id;
+        const result = await deleteUser(user._id);
+        if (result.success) {
+            toast({
+                title: 'Conta excluída',
+                description: 'Sua conta foi removida com sucesso',
+                status: 'success',
+                duration: 5000,
+                isClosable: true,
+            });
+            navigate('/login');
+            } else {
+            toast({
+                title: 'Erro na exclusão',
+                description: result.message,
+                status: 'error',
+                duration: 7000,
+                isClosable: true,
+            });
+        };
         onDeleteDialogClose();
     };
 
@@ -651,7 +673,8 @@ const ProfilePage = () => {
                     </AlertDialogHeader>
         
                     <AlertDialogBody>
-                        Tem certeza que deseja excluir sua conta permanentemente? Esta ação não pode ser desfeita.
+                        <Text>Tem certeza que deseja excluir sua conta permanentemente?</Text>
+                        <Text>Esta ação não pode ser desfeita.</Text>
                     </AlertDialogBody>
         
                     <AlertDialogFooter>

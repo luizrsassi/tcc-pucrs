@@ -248,6 +248,25 @@ export const userHandler = create((set, get) => ({
         adminClubs: state.user.adminClubs.filter(id => id !== clubId)
       }
     }));
+  },
+
+  deleteUser: async (userId) => {
+    try {
+      set({ loading: true });
+      const { data } = await api.delete(`/users/${userId}`);
+      
+      // Limpa o estado do usuário
+      localStorage.removeItem("user");
+      set({ user: null });
+      
+      return { success: true, message: data.message };
+      
+    } catch (error) {
+      const message = error.response?.data?.error || error.message;
+      return { success: false, message };
+    } finally {
+      set({ loading: false });
+    }
   }
 
 }));
