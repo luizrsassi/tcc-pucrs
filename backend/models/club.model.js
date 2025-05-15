@@ -47,7 +47,7 @@ const ClubSchema = new Schema(
                 type: String,
                 required: [true, 'Cada regra precisa ter um conteúdo'],
                 trim: true,
-                minlength: [10, 'Cada regra deve ter pelo menos 10 caracteres'],
+                minlength: [5, 'Cada regra deve ter pelo menos 5 caracteres'],
                 maxlength: [200, 'Cada regra não pode exceder 200 caracteres']
             }],
             default: [],

@@ -4,9 +4,7 @@ import mongoose from 'mongoose';
 import Meet from '../models/meet.model.js';
 import fs from "fs";
 import path from "path";
-import { v4 as uuidv4 } from 'uuid';
 import { fileURLToPath } from "url";
-import sharp from 'sharp';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -40,23 +38,22 @@ export const create = async (req, res) => {
             });
         }
 
-        // filename = `banner-${uuidv4()}.webp`;
         filename = req.file.filename;
         const bannerUrl = `${req.protocol}://${req.get("host")}/uploads/clubs/${filename}`;
         
-        // await sharp(req.file.buffer)
-        //     .resize(1200, 600, { fit: 'cover' })
-        //     .webp({ quality: 80 })
-        //     .toFile(path.join(uploadDir, filename));
-
-        const newClub = await Club.create([{
+        const clubData = {
             name,
             banner: bannerUrl,
             admin: adminId,
             description,
-            rules,
             members: [adminId]
-        }], { session });
+        };
+
+        if (rules && Array.isArray(rules) && rules.length > 0) {
+            clubData.rules = rules;
+        }
+
+        const newClub = await Club.create([clubData], { session });
 
         const updatedUser = await User.findByIdAndUpdate(
             adminId,
