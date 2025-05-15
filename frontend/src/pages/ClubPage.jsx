@@ -122,6 +122,30 @@ const ClubPage = () => {
         }
     };
 
+    const handleLeaveClub = async () => {
+        // const result = await leaveClub(clubId); // Supondo que leaveClub existe no clubHandler
+        console.log("Você saiu do clube");
+        if (result.success) {
+            toast({
+                title: 'Sucesso!',
+                description: 'Você saiu do clube com sucesso',
+                status: 'success',
+                duration: 3000,
+                isClosable: true,
+            });
+            await getClubById(clubId);
+            userHandler.getState().fetchUserProfile();
+        } else {
+            toast({
+                title: 'Erro',
+                description: result.message,
+                status: 'error',
+                duration: 5000,
+                isClosable: true,
+            });
+        }
+    };
+
     const isMember = user?.memberClubs?.some(clubId => 
         clubId?.toString() === currentClub?._id?.toString()
     );
@@ -171,6 +195,24 @@ const ClubPage = () => {
                             isLoading={loading}
                         >
                             Ingresar no Clube
+                        </Button>
+                    )}
+
+                    {isMember && (
+                        <Button
+                            colorScheme="red"
+                            onClick={handleLeaveClub}
+                            size="xs"
+                            w="120px"
+                            borderRadius="md"
+                            px={2}
+                            py={1}
+                            fontWeight="medium"
+                            letterSpacing="wide"
+                            _hover={{ bg: "red.400" }}
+                            isLoading={loading}
+                        >
+                            Sair do Clube
                         </Button>
                     )}
 
