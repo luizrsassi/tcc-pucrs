@@ -149,6 +149,76 @@ export const getProfile = async (req, res) => {
     }
 };
 
+// export const updateUser = async (req, res) => {
+//     try {
+//         const userId = req.params.id;
+//         const updates = req.body;
+//         const currentUser = req.user;
+
+//         if (currentUser._id.toString() !== userId && !currentUser.isAdmin) {
+//         return res.status(403).json({ 
+//             success: false,
+//             message: 'Não autorizado: você só pode atualizar seu próprio perfil' 
+//         });
+//         }
+
+//         const user = await User.findById(userId);
+//         if (!user) {
+//         return res.status(404).json({ 
+//             success: false,
+//             message: 'Usuário não encontrado' 
+//         });
+//         }
+
+//         if (req.file) {
+//         if (user.photo) {
+//             const oldPhotoPath = path.join(__dirname, '../../uploads/users/', user.photo);
+//             fs.unlink(oldPhotoPath, (error) => {
+//             if (error) {
+//                 console.error(`Erro ao deletar imagem: ${error.message}`);
+//             } else {
+//                 console.log(`Imagem ${user.photo} deletada com sucesso`);
+//             }
+//             });
+//         }
+//         user.photo = req.file.filename;
+//         }
+
+
+
+//         const allowedUpdates = ['name', 'email', 'password'];
+//         Object.keys(updates).forEach(key => {
+//         if (allowedUpdates.includes(key)) {
+//             user[key] = updates[key];
+//         }
+//         });
+
+//         const updatedUser = await user.save();
+
+//         const responseUser = {
+//         _id: updatedUser._id,
+//         name: updatedUser.name,
+//         email: updatedUser.email,
+//         photo: `${process.env.BASE_URL}/uploads/users/${updatedUser.photo}`,
+//         isAdmin: updatedUser.isAdmin,
+//         memberClubs: updatedUser.memberClubs,
+//         adminClubs: updatedUser.adminClubs
+//         };
+
+//         res.status(200).json({ success: true, data: responseUser });
+
+//     } catch (error) {
+//         console.error('Erro na atualização:', error);
+        
+//         let message = 'Erro ao atualizar usuário';
+//         if (error.code === 11000) {
+//         message = 'Este email já está em uso';
+//         }
+
+//         res.status(500).json({ success: false, message: message });
+//     }
+// };
+
 export const updateUser = async (req, res) => {
     try {
         const userId = req.params.id;
@@ -156,51 +226,69 @@ export const updateUser = async (req, res) => {
         const currentUser = req.user;
 
         if (currentUser._id.toString() !== userId && !currentUser.isAdmin) {
-        return res.status(403).json({ 
-            success: false,
-            message: 'Não autorizado: você só pode atualizar seu próprio perfil' 
-        });
+            return res.status(403).json({ 
+                success: false,
+                message: 'Não autorizado: você só pode atualizar seu próprio perfil' 
+            });
         }
 
         const user = await User.findById(userId);
         if (!user) {
-        return res.status(404).json({ 
-            success: false,
-            message: 'Usuário não encontrado' 
-        });
-        }
-
-        if (req.file) {
-        if (user.photo) {
-            const oldPhotoPath = path.join(__dirname, '../../uploads/users/', user.photo);
-            fs.unlink(oldPhotoPath, (error) => {
-            if (error) {
-                console.error(`Erro ao deletar imagem: ${error.message}`);
-            } else {
-                console.log(`Imagem ${user.photo} deletada com sucesso`);
-            }
+            return res.status(404).json({ 
+                success: false,
+                message: 'Usuário não encontrado' 
             });
         }
-        user.photo = req.file.filename;
+
+        // Verificação e atualização de senha
+        if (updates.newPassword) {
+            if (!updates.currentPassword) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'Senha atual é obrigatória para alteração'
+                });
+            }
+
+            const isMatch = await bcrypt.compare(updates.currentPassword, user.password);
+            if (!isMatch) {
+                return res.status(401).json({
+                    success: false,
+                    message: 'Senha atual incorreta'
+                });
+            }
+
+            user.password = updates.newPassword;
         }
 
-        const allowedUpdates = ['name', 'email', 'password'];
-        Object.keys(updates).forEach(key => {
-        if (allowedUpdates.includes(key)) {
-            user[key] = updates[key];
+        // Atualização de foto
+        if (req.file) {
+            if (user.photo) {
+                const oldPhotoPath = path.join(__dirname, '../../uploads/users/', user.photo);
+                fs.unlink(oldPhotoPath, (error) => {
+                    if (error) console.error(`Erro ao deletar imagem: ${error.message}`);
+                });
+            }
+            user.photo = req.file.filename;
         }
+
+        // Atualização de campos básicos
+        const allowedUpdates = ['name', 'email'];
+        Object.keys(updates).forEach(key => {
+            if (allowedUpdates.includes(key)) {
+                user[key] = updates[key];
+            }
         });
 
         const updatedUser = await user.save();
 
         const responseUser = {
-        _id: updatedUser._id,
-        name: updatedUser.name,
-        email: updatedUser.email,
-        photo: `${process.env.BASE_URL}/uploads/users/${updatedUser.photo}`,
-        isAdmin: updatedUser.isAdmin,
-        memberClubs: updatedUser.memberClubs,
-        adminClubs: updatedUser.adminClubs
+            _id: updatedUser._id,
+            name: updatedUser.name,
+            email: updatedUser.email,
+            photo: `${process.env.BASE_URL}/uploads/users/${updatedUser.photo}`,
+            isAdmin: updatedUser.isAdmin,
+            memberClubs: updatedUser.memberClubs,
+            adminClubs: updatedUser.adminClubs
         };
 
         res.status(200).json({ success: true, data: responseUser });
@@ -209,10 +297,11 @@ export const updateUser = async (req, res) => {
         console.error('Erro na atualização:', error);
         
         let message = 'Erro ao atualizar usuário';
-        if (error.code === 11000) {
-        message = 'Este email já está em uso';
-        }
-
-        res.status(500).json({ success: false, message: message });
+        if (error.code === 11000) message = 'Este email já está em uso';
+        
+        res.status(500).json({ 
+            success: false, 
+            message: error.response?.data?.message || message 
+        });
     }
 };

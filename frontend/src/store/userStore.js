@@ -18,7 +18,7 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-export const userHandler = create((set) => ({
+export const userHandler = create((set, get) => ({
   user: JSON.parse(localStorage.getItem("user")) || null,
   error: null,
   loading: true,
@@ -123,22 +123,73 @@ export const userHandler = create((set) => ({
 
   updateUser: async (updatedData) => {
     try {
-      set({ loading: true });
+      const { user } = get();
+      user._id = user._id || user.id;
+      if (user.id) delete user.id;
+      if (!user?._id) {
+        throw new Error('Usuário não autenticado');
+      }
+      set({ loading: true, error: null });
       
+      // Verifica se está tentando alterar a senha
+      if (updatedData.newPassword || updatedData.confirmPassword) {
+        // Validação 1: Senha atual é obrigatória
+        if (!updatedData.currentPassword) {
+          return { 
+            success: false, 
+            message: "Por favor, informe sua senha atual" 
+          };
+        }
+      
+        // Validação 2: Nova senha e confirmação devem ser iguais
+        if (updatedData.newPassword !== updatedData.confirmPassword) {
+          return {
+            success: false,
+            message: "A nova senha e a confirmação não coincidem"
+          };
+        }
+      }
       const formData = new FormData();
+      
+      // Campos básicos
       if (updatedData.name) formData.append('name', updatedData.name);
-      if (updatedData.photo) formData.append('photo', updatedData.photo);
+      if (updatedData.email) formData.append('email', updatedData.email);
       
-      const { data } = await api.patch("/profile", formData);
+      // Campos de senha (apenas se houver alteração)
+      if (updatedData.currentPassword) formData.append('currentPassword', updatedData.currentPassword);
+      if (updatedData.newPassword) formData.append('newPassword', updatedData.newPassword);
       
-      // Atualiza localStorage
-      localStorage.setItem("user", JSON.stringify(data));
-      set({ user: data });
+      // Foto (se houver)
+      if (updatedData.photo instanceof File) {
+        formData.append('photo', updatedData.photo);
+      }
       
-      return { success: true, message: "Perfil atualizado!" };
+      // Chamada API
+      const { data } = await api.put(`/users/${user._id}`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+
+      const normalizedData = {
+        ...data,
+        _id: data._id || data.id || user._id
+      };
+
+      // Atualizar storage e estado (limpar senhas)
+      const updatedUser = { 
+        ...user,
+        ...normalizedData,
+        token: user.token
+      };
       
+      localStorage.setItem("user", JSON.stringify(updatedUser));
+      set({ user: updatedUser });
+      
+      return { success: true, message: "Perfil atualizado com sucesso!" };
+
     } catch (error) {
-      const message = error.response?.data?.error || error.message;
+      const message = error.response?.data?.message || error.message;
       set({ error: message });
       return { success: false, message };
     } finally {

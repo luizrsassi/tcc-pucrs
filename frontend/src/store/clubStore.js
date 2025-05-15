@@ -30,7 +30,7 @@ export const clubHandler = create((set, get) => ({
   createClub: async (clubData, bannerFile) => {
     try {
       set({ loading: true, error: null });
-      
+      console.log(clubData.rules);
       const formData = new FormData();
       formData.append('name', clubData.name);
       formData.append('description', clubData.description);

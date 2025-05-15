@@ -46,13 +46,15 @@ const ProfilePage = () => {
     const fileInputRef = useRef();
     const [isUpdatingPhoto, setIsUpdatingPhoto] = useState(false);
     const [tempPhoto, setTempPhoto] = useState(null);
-    const { user, loadingUser } = userHandler();
+    const { user, loadingUser, updateUser } = userHandler();
     const { getClubById } =clubHandler();
+
     const { 
         isOpen: isCreateClubOpen, 
         onOpen: onCreateClubOpen, 
         onClose: onCreateClubClose 
     } = useDisclosure();
+
     const { 
         isOpen: isDeleteDialogOpen, 
         onOpen: onDeleteDialogOpen, 
@@ -60,6 +62,7 @@ const ProfilePage = () => {
     } = useDisclosure();
 
     const [clubToDelete, setClubToDelete] = useState(null);
+
     const { 
         isOpen: isDeleteClubOpen, 
         onOpen: onDeleteClubOpen, 
@@ -69,8 +72,8 @@ const ProfilePage = () => {
     const cancelRef = useRef();
     
     const [userData, setUserData] = useState({
-        name: user?.name || '',
-        email: user?.email || '',
+        name: '',
+        email: '',
         currentPassword: '',
         newPassword: '',
         confirmPassword: ''
@@ -133,11 +136,23 @@ const ProfilePage = () => {
     }, [user, getClubById]);
 
     // Atualizar estado local quando os dados do usuário mudarem
+    // useEffect(() => {
+    //     if (user) {
+    //         setUserData({
+    //             name: user.name,
+    //             email: user.email,
+    //             currentPassword: '',
+    //             newPassword: '',
+    //             confirmPassword: ''
+    //         });
+    //     }
+    // }, [user]);
+
     useEffect(() => {
         if (user) {
             setUserData({
-                name: user.name,
-                email: user.email,
+                name: user.name || '',
+                email: user.email || '',
                 currentPassword: '',
                 newPassword: '',
                 confirmPassword: ''
@@ -152,37 +167,86 @@ const ProfilePage = () => {
         });
     };
   
+    // const handleSave = async () => {
+    //     try {
+    //         const updateData = {
+    //             name: userData.name,
+    //             email: userData.email
+    //         };
+
+    //         // Se houver nova foto, adicione ao FormData
+    //         if (tempPhoto) {
+    //             const formData = new FormData();
+    //             formData.append('photo', tempPhoto.file);
+                
+    //             // Aqui você faria o upload real da foto
+    //             // await api.uploadPhoto(formData);
+    //         }
+
+    //         // await updateUser(updateData);
+    //         toast({
+    //             title: 'Alterações salvas!',
+    //             status: 'success',
+    //             duration: 3000,
+    //             isClosable: true,
+    //         });
+
+    //         setTempPhoto(null); // Limpa a foto temporária após salvar
+
+    //     } catch (error) {
+    //         console.error("Erro ao atualizar:", error);
+    //     }
+    // };
+  
     const handleSave = async () => {
         try {
-            const updateData = {
+            const result = await updateUser({
                 name: userData.name,
-                email: userData.email
-            };
-
-            // Se houver nova foto, adicione ao FormData
-            if (tempPhoto) {
-                const formData = new FormData();
-                formData.append('photo', tempPhoto.file);
-                
-                // Aqui você faria o upload real da foto
-                // await api.uploadPhoto(formData);
-            }
-
-            // await updateUser(updateData);
-            toast({
-                title: 'Alterações salvas!',
-                status: 'success',
-                duration: 3000,
-                isClosable: true,
+                email: userData.email,
+                currentPassword: userData.currentPassword,
+                newPassword: userData.newPassword,
+                confirmPassword: userData.confirmPassword,
+                photo: tempPhoto?.file
             });
 
-            setTempPhoto(null); // Limpa a foto temporária após salvar
+            if (result.success) {
+                toast({
+                    title: 'Sucesso!',
+                    description: result.message,
+                    status: 'success',
+                    duration: 5000,
+                    isClosable: true,
+                });
+
+            // Limpar campos de senha e foto temporária
+            setUserData(prev => ({
+                ...prev,
+                currentPassword: '',
+                newPassword: '',
+                confirmPassword: ''
+            }));
+                setTempPhoto(null);
+
+            } else {
+                toast({
+                    title: 'Erro na atualização',
+                    description: result.message,
+                    status: 'error',
+                    duration: 7000,
+                    isClosable: true,
+                });
+            }
 
         } catch (error) {
-            console.error("Erro ao atualizar:", error);
+            toast({
+            title: 'Erro inesperado',
+            description: 'Ocorreu um erro durante a atualização',
+            status: 'error',
+            duration: 5000,
+            isClosable: true,
+            });
         }
     };
-  
     const handleDeleteAccount = () => {
         console.log("Conta excluída");
         onDeleteDialogClose();
@@ -190,11 +254,7 @@ const ProfilePage = () => {
 
     const handleCreateClub = async (clubData) => {
         try {
-          // Aqui você deve adicionar a lógica para enviar para a API
           console.log('Dados do novo clube:', clubData);
-          // Exemplo:
-          // await api.post('/clubs', clubData);
-          // Atualizar a lista de clubes
         } catch (error) {
           console.error('Erro ao criar clube:', error);
         }
@@ -217,19 +277,40 @@ const ProfilePage = () => {
         }), 1500));
     };
   
+    // const handleFileChange = (e) => {
+    //     const file = e.target.files[0];
+    //     if (!file) return;
+
+    //     // Cria URL temporária para pré-visualização
+    //     const tempUrl = URL.createObjectURL(file);
+    //     setTempPhoto({
+    //         file,    // Armazena o arquivo original
+    //         url: tempUrl // Armazena a URL temporária
+    //     });
+
+    //     // Atualiza visualização imediatamente
+    //     userHandler.getState().setUser({
+    //         ...user,
+    //         photo: tempUrl
+    //     });
+
+    //     e.target.value = '';
+    // };
+
     const handleFileChange = (e) => {
         const file = e.target.files[0];
         if (!file) return;
 
-        // Cria URL temporária para pré-visualização
+        // Validações de tipo e tamanho...
+        
         const tempUrl = URL.createObjectURL(file);
         setTempPhoto({
-            file,    // Armazena o arquivo original
-            url: tempUrl // Armazena a URL temporária
+            file,
+            url: tempUrl
         });
 
-        // Atualiza visualização imediatamente
-        userHandler.getState().setUser({
+        // Atualização correta do estado
+        setUser({
             ...user,
             photo: tempUrl
         });
@@ -411,6 +492,8 @@ const ProfilePage = () => {
                                     colorScheme="blue" 
                                     flex={1}
                                     onClick={handleSave}
+                                    isLoading={loadingUser}
+                                    loadingText="Salvando..."
                                     >
                                     Salvar Alterações
                                     </Button>
