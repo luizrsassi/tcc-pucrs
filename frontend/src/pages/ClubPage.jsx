@@ -1,4 +1,4 @@
-import { Box, Container, Grid, Flex, Button, Text } from '@chakra-ui/react';
+import { Box, Container, Grid, Flex, Button, Text, useToast } from '@chakra-ui/react';
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate, Navigate, useParams } from 'react-router-dom';
 import MainContainer from '../components/MainContainer';
@@ -13,6 +13,7 @@ import { userHandler } from '../store/userStore';
 import { debounce } from 'lodash';
 
 const ClubPage = () => {
+    const toast = useToast();
     const navigate = useNavigate();
     const { clubId } = useParams();
     const { user } = userHandler();
@@ -94,6 +95,38 @@ const ClubPage = () => {
         handleCloseModal();
     };
 
+    const handleJoinClub = async () => {
+        // const result = await joinClub(clubId);
+        
+        if (result.success) {
+        toast({
+            title: 'Sucesso!',
+            description: 'Você ingressou no clube',
+            status: 'success',
+            duration: 3000,
+            isClosable: true,
+        });
+        // Atualiza os dados do clube
+        await getClubById(clubId);
+        // Atualiza os dados do usuário se necessário
+        userHandler.getState().fetchUser(); 
+        } else {
+        toast({
+            title: 'Erro',
+            description: result.message,
+            status: 'error',
+            duration: 5000,
+            isClosable: true,
+        });
+        }
+    };
+
+    const isMember = user?.memberClubs?.some(clubId => 
+        clubId?.toString() === currentClub?._id?.toString()
+    );
+
+    const idUser = user._id || user.id
+
     if (!token) return <Navigate to="/login" replace />;
 
     return (
@@ -106,20 +139,39 @@ const ClubPage = () => {
 
             <Container maxW="980px" py={8}>
                 <Flex direction="column" gap={3}>
-                    <Button 
-                        colorScheme="blue" 
-                        variant="solid"
-                        onClick={() => setIsCreateModalOpen(true)}
-                        size="sm"
-                        borderRadius="md"
-                        px={3}
-                        py={1}
-                        fontWeight="medium"
-                        letterSpacing="wide"
-                        _hover={{ bg: "blue.400" }}
-                    >
-                        Novo Encontro
-                    </Button> 
+                    {user?.adminClubs?.some(club => club.toString() === currentClub?._id?.toString()) && (
+                        <Button 
+                            colorScheme="blue" 
+                            variant="solid"
+                            onClick={() => setIsCreateModalOpen(true)}
+                            size="sm"
+                            borderRadius="md"
+                            px={3}
+                            py={1}
+                            fontWeight="medium"
+                            letterSpacing="wide"
+                            _hover={{ bg: "blue.400" }}
+                        >
+                            Novo Encontro
+                        </Button>
+                    )} 
+
+                    {!isMember && idUser && (
+                        <Button
+                            colorScheme="green"
+                            onClick={handleJoinClub}
+                            size="sm"
+                            borderRadius="md"
+                            px={3}
+                            py={1}
+                            fontWeight="medium"
+                            letterSpacing="wide"
+                            _hover={{ bg: "green.400" }}
+                            isLoading={loading}
+                        >
+                            Ingresar no Clube
+                        </Button>
+                    )}
 
                     <Box mb={8}>
                         <SearchBar 
