@@ -56,6 +56,7 @@ const LoginPage = () => {
         <FormControl isRequired>
           <FormLabel>Email</FormLabel>
           <Input
+            data-cy="email-input"
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
@@ -67,6 +68,7 @@ const LoginPage = () => {
           <FormLabel>Senha</FormLabel>
           <InputGroup>
             <Input
+              data-cy="password-input"
               type={showPassword ? 'text' : 'password'}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -74,6 +76,7 @@ const LoginPage = () => {
             />
             <InputRightElement width="4.5rem">
               <Button
+                data-cy="submit-button"
                 h="1.75rem"
                 size="sm"
                 onClick={() => setShowPassword(!showPassword)}

@@ -202,16 +202,16 @@ export const userHandler = create((set, get) => ({
       set({ loading: true, error: null });
 
       const { data } = await api.post("/users/login", credentials);
-    
       // Armazena dados no localStorage
       localStorage.setItem("token", data.token);
-      localStorage.setItem("user", JSON.stringify(data.user)); // Novo
+      localStorage.setItem("user", JSON.stringify(data.user));
       
       set({ user: data.user, error: null });
       return { success: true, message: "Login realizado com sucesso!" };
 
     } catch (error) {
-      // ... (existente)
+      set({ loading: false, error: error });
+      return { success: false, message: "Login ou senha incorretos." };
     }
   },
 

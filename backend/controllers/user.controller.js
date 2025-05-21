@@ -37,7 +37,7 @@ export const login = async (req, res) => {
         const user = await User.findOne({ email }).select("+password");
 
         if (!user || !(await user.comparePassword(password))) {
-        throw new Error("Credenciais inválidas");
+            return res.status(401).json({ success: false, error: error.message });
         }
 
         const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
