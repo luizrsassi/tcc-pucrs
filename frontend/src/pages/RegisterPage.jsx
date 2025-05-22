@@ -102,6 +102,7 @@ const RegisterPage = () => {
                                 <Avatar
                                     size="2xl"
                                     src={prevPhotoRef.current || ''}
+                                    data-cy="profile-avatar"
                                 />
                                 <Input
                                     name="photo"
@@ -110,12 +111,14 @@ const RegisterPage = () => {
                                     onChange={handlePhotoChange}
                                     display="none"
                                     id="fileInput"
+                                    data-cy="upload-file-input"
                                 />
                                 <Button
                                     as="label"
                                     htmlFor="fileInput"
                                     variant="outline"
                                     cursor="pointer"
+                                    data-cy="upload-button"
                                 >
                                     {newUser.photo ? 'Alterar Foto' : 'Adicionar Foto'}
                                 </Button>
