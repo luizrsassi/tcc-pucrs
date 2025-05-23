@@ -10,6 +10,7 @@ const ClubCard = ({ club }) => {
             borderRadius="lg"
             boxShadow="md"
             _hover={{ transform: 'scale(1.02)', transition: 'transform 0.2s' }}
+            data-cy="club-card"
         >
             <Link to={`/clubs/${club._id}`}>
                 <Image
@@ -20,7 +21,12 @@ const ClubCard = ({ club }) => {
                 />
                 <CardBody>
                     <Stack spacing={2}>
-                        <Heading fontSize="xl" fontFamily="Roboto" fontWeight="bold">
+                        <Heading 
+                            fontSize="xl" 
+                            fontFamily="Roboto" 
+                            fontWeight="bold"
+                            data-cy="club-card-title"
+                        >
                             {club.name}
                         </Heading>
                         
@@ -28,6 +34,7 @@ const ClubCard = ({ club }) => {
                             fontSize="md" 
                             color="gray.600"
                             noOfLines={3}
+                            data-cy="club-card-description"
                         >
                             {club.description || 'Clube de leitura sem descrição'}
                         </Text>

@@ -177,7 +177,7 @@ export const clubHandler = create((set, get) => ({
       };
       
     } catch (error) {
-      const message = error.response?.data?.message || error.message;
+      let message = error.response?.data?.message || error.message;
       let errorCode = null;
       
       // Tratamento específico de erros

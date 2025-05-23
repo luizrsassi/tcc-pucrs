@@ -18,8 +18,29 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
+const getParsedUserFromLocalStorage = () => {
+  const userString = localStorage.getItem("user");
+  
+  // Se o item não existir ou for a string "undefined", retorne null
+  if (userString === null || userString === "undefined") {
+    return null;
+  }
+
+  try {
+    // Tente fazer o parse
+    return JSON.parse(userString);
+  } catch (error) {
+    // Se houver um erro de parsing (JSON inválido), logue o erro
+    console.error("Erro ao fazer JSON.parse do usuário no localStorage:", error);
+    // E opcionalmente, remova o item corrompido para evitar o erro novamente
+    localStorage.removeItem("user"); 
+    return null; // Retorne null para indicar que não há usuário válido
+  }
+};
+
 export const userHandler = create((set, get) => ({
-  user: JSON.parse(localStorage.getItem("user")) || null,
+  
+  user: getParsedUserFromLocalStorage(),
   error: null,
   loading: true,
 

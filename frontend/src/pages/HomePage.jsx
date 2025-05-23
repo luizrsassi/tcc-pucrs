@@ -68,7 +68,6 @@ const HomePage = () => {
         return <Navigate to="/login" replace />;
     }
 
-
     return (
         <Box bg="gray.50" minH="100vh">
             <NavBar />
@@ -95,7 +94,7 @@ const HomePage = () => {
 
                 {loading ? (
                 <Flex justify="center" py={10}>
-                    <Spinner size="xl" />
+                    <Spinner size="xl" data-cy="loading-spinner" />
                 </Flex>
                 ) : (
                 <>
