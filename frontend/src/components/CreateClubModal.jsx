@@ -120,6 +120,7 @@ const CreateClubModal = ({ isOpen, onClose }) => {
                 <FormControl>
                     <FormLabel>Imagem de Capa</FormLabel>
                     <Input
+                    data-cy="banner"
                     type="file"
                     name="banner"
                     onChange={handleFileChange}
@@ -131,6 +132,7 @@ const CreateClubModal = ({ isOpen, onClose }) => {
                 <FormControl isRequired>
                     <FormLabel>Nome do Clube</FormLabel>
                     <Input
+                    data-cy="club-name"
                     name="name"
                     value={formData.name}
                     onChange={handleChange}
@@ -142,6 +144,7 @@ const CreateClubModal = ({ isOpen, onClose }) => {
                 <FormControl>
                     <FormLabel>Descrição</FormLabel>
                     <Textarea
+                    data-cy="club-description"
                     name="description"
                     value={formData.description}
                     onChange={handleChange}
@@ -153,7 +156,10 @@ const CreateClubModal = ({ isOpen, onClose }) => {
                 {/* Regras do Clube */}
                 <FormControl>
                     <FormLabel>Regras do Clube</FormLabel>
-                    <VStack spacing={2} align="stretch">
+                    <VStack 
+                        spacing={2} 
+                        align="stretch"
+                    >
                     {formData.rules.map((rule, index) => (
                         <HStack key={index}>
                         <Input
@@ -184,17 +190,19 @@ const CreateClubModal = ({ isOpen, onClose }) => {
                 {/* Botões de Ação */}
                 <Flex w="full" justify="flex-end" gap={3} mt={6}>
                     <Button 
+                        data-cy="cancel-button"
                         onClick={onClose} 
                         variant="ghost"
                         isDisabled={isLoading}
                     >
                     Cancelar
                     </Button>
-                    <Button 
-                    colorScheme="blue" 
-                    type="submit"
-                    isLoading={isLoading}
-                    loadingText="Criando..."
+                    <Button
+                        data-cy="create-button"
+                        colorScheme="blue" 
+                        type="submit"
+                        isLoading={isLoading}
+                        loadingText="Criando..."
                     >
                     Criar Clube
                     </Button>

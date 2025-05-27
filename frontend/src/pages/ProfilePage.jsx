@@ -597,6 +597,7 @@ const ProfilePage = () => {
                                                     </Link>
                                                     <HStack spacing={3}>
                                                         <IconButton
+                                                            cy-data="edit-club"
                                                             aria-label="Editar clube"
                                                             icon={<FiEdit />}
                                                             variant="ghost"
