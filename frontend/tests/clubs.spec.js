@@ -7,7 +7,7 @@ const __dirname = path.dirname(__filename);
 const frontendBaseUrl = 'http://localhost:5173';
 const backendBaseUrl = 'http://localhost:5000';
 
-test.describe('Página de Criação de Clube via Perfil', () => {
+test.describe.serial('Página de Criação de Clube via Perfil', () => {
     let clubName = ''
     test.beforeEach(async ({ page, request }) => {
         await page.goto(frontendBaseUrl);
@@ -51,6 +51,9 @@ test.describe('Página de Criação de Clube via Perfil', () => {
         
         await expect(page.locator('[data-cy="cancel-button"]')).toHaveText('Cancelar');
         await expect(page.locator('[data-cy="cancel-button"]')).toBeVisible();
+
+        await page.getByRole('button', { name: 'Cancelar' }).click();
+        await page.getByRole('button', { name: 'Sair' }).click();
     });
 
     test('2. Deve criar um novo clube com sucesso preenchendo o formulário', async ({ page }) => {
@@ -80,11 +83,14 @@ test.describe('Página de Criação de Clube via Perfil', () => {
 
         await expect(page.getByText('Criar Novo Clube')).not.toBeVisible();
         await expect(page.getByText('Clube criado com sucesso!')).toBeVisible();
+
+        await page.getByRole('button', { name: 'Sair' }).click();
     });
 
     test('3. Deve editar o clube criado anteriormente.', async ({page}) => {
-        console.log(clubName);
-        await page.locator('div').getByText('Clube de Teste Playwright').first().getByLabel('Editar clube').click();        
+        
+        await expect(page.locator('div').filter({ hasText: 'Clube de Teste Playwright' }).last()).toBeVisible();
+        await page.locator('div').filter({ hasText: 'Clube de Teste Playwright' }).last().getByLabel('Editar clube').click();        
         await page.getByRole('textbox', { name: 'Nome do Clube' }).click();
         await page.getByRole('textbox', { name: 'Nome do Clube' }).fill('Clube de Teste Playwright' + Date.now());
         await page.getByRole('textbox', { name: 'Descrição' }).click();
@@ -96,6 +102,14 @@ test.describe('Página de Criação de Clube via Perfil', () => {
         await page.getByRole('textbox', { name: 'Regra #' }).click();
         await page.getByRole('textbox', { name: 'Regra #' }).fill('regra 2');
         await page.getByRole('button', { name: 'Salvar Alterações' }).click();
+    });
+
+    test('4. Deve deletar o clube com o nome "Clube de Teste Playwright"', async ({page}) => {
+        
+        await expect(page.locator('div').filter({ hasText: 'Clube de Teste Playwright' }).last()).toBeVisible();
+        await page.locator('div').filter({ hasText: 'Clube de Teste Playwright' }).last().getByLabel('Excluir clube').click();
+        await page.getByRole('button', { name: 'Excluir' }).click();
+        await page.getByRole('button', { name: 'Sair' }).click();
     });
    
 });
