@@ -6,3 +6,4 @@ uploads/*
 # playwright
 frontend/playwright-report/
 frontend/test-results/
+frontend/tests/test*

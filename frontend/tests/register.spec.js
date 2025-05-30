@@ -31,7 +31,6 @@ test.describe('Testes de Registro', () => {
     });
 
     test('Deve permitir upload de foto de perfil', async ({ page }) => {
-        // Define o diretório atual do arquivo de teste em ambiente ESM
         const __filename = fileURLToPath(import.meta.url);
         const __dirname = dirname(__filename);
 
