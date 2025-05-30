@@ -580,7 +580,11 @@ const ProfilePage = () => {
                                         <List spacing={4}>
                                             {adminClubsList.map((club) => (
                                             <ListItem key={club._id}>
-                                                <Flex justify="space-between" align="center">
+                                                <Flex 
+                                                    justify="space-between" 
+                                                    align="center" 
+                                                    data-cy="club-list-item"
+                                                >
                                                     <Link to={`/clubs/${club._id}`}>
                                                         <Text
                                                             fontSize="22px"
@@ -597,7 +601,7 @@ const ProfilePage = () => {
                                                     </Link>
                                                     <HStack spacing={3}>
                                                         <IconButton
-                                                            cy-data="edit-club"
+                                                            cy-data="edit-club-icon"
                                                             aria-label="Editar clube"
                                                             icon={<FiEdit />}
                                                             variant="ghost"

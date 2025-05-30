@@ -125,11 +125,11 @@ const EditClubModal = ({ isOpen, onClose, club }) => {
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} size="xl" onCloseComplete={() => setPreviewImage('')}>
+    <Modal isOpen={isOpen} onClose={onClose} size="xl" onCloseComplete={() => setPreviewImage('')} data-cy="edit-club-modal">
       <ModalOverlay />
       <ModalContent>
         <ModalHeader>Editar Clube</ModalHeader>
-        <ModalCloseButton />
+        <ModalCloseButton data-cy="edit-modal-close-button" />
         
         <ModalBody pb={6}>
           <form onSubmit={handleSubmit}>
@@ -151,6 +151,7 @@ const EditClubModal = ({ isOpen, onClose, club }) => {
                   type="file"
                   accept="image/*"
                   onChange={handleFileChange}
+                  data-cy="edit-club-banner-input"
                 />
               </FormControl>
 
@@ -162,6 +163,7 @@ const EditClubModal = ({ isOpen, onClose, club }) => {
                   value={formData.name}
                   onChange={handleChange}
                   placeholder="Nome do clube"
+                  data-cy="edit-club-name-input"
                 />
               </FormControl>
 
@@ -174,6 +176,7 @@ const EditClubModal = ({ isOpen, onClose, club }) => {
                   onChange={handleChange}
                   placeholder="Descrição do clube"
                   rows={4}
+                  data-cy="edit-club-description-textarea"
                 />
               </FormControl>
 
@@ -187,6 +190,7 @@ const EditClubModal = ({ isOpen, onClose, club }) => {
                         value={rule}
                         onChange={(e) => handleRuleChange(index, e.target.value)}
                         placeholder={`Regra #${index + 1}`}
+                        data-cy={`edit-club-rule-input-${index}`}
                       />
                       <IconButton
                         aria-label="Remover regra"
@@ -194,6 +198,7 @@ const EditClubModal = ({ isOpen, onClose, club }) => {
                         onClick={() => removeRuleField(index)}
                         colorScheme="red"
                         size="sm"
+                        data-cy={`edit-club-remove-rule-button-${index}`}
                       />
                     </HStack>
                   ))}
@@ -202,6 +207,7 @@ const EditClubModal = ({ isOpen, onClose, club }) => {
                     onClick={addRuleField}
                     size="sm"
                     variant="outline"
+                    data-cy="edit-club-add-rule-button"
                   >
                     Adicionar Regra
                   </Button>
@@ -214,6 +220,7 @@ const EditClubModal = ({ isOpen, onClose, club }) => {
                   onClick={onClose}
                   variant="ghost"
                   isDisabled={isLoading}
+                  data-cy="edit-club-cancel-button"
                 >
                   Cancelar
                 </Button>
@@ -222,6 +229,7 @@ const EditClubModal = ({ isOpen, onClose, club }) => {
                   type="submit"
                   isLoading={isLoading}
                   loadingText="Salvando..."
+                  data-cy="edit-club-save-button"
                 >
                   Salvar Alterações
                 </Button>

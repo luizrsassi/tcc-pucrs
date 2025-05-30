@@ -2,3 +2,7 @@ package*.json
 node_modules
 .env
 uploads/*
+
+# playwright
+frontend/playwright-report/
+frontend/test-results/
