@@ -11,6 +11,12 @@ jobs:
     name: Run Playwright Tests
     runs-on: ubuntu-latest
 
+    services:
+      mongodb:
+        image: mongo:4.4
+        ports:
+          - 27017:27017
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
@@ -32,7 +38,7 @@ jobs:
       run: npm run dev &
       working-directory: backend/
       env:
-        MONGODB_URI: ${{ secrets.MONGO_URI }}
+        MONGODB_URI: mongodb://localhost:27017/test_database_ci
 
     - name: Wait for backend to be ready
       run: npx wait-on http://localhost:5000/api/users/login --timeout 60000
