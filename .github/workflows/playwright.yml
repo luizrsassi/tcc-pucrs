@@ -41,7 +41,7 @@ jobs:
         MONGODB_URI: mongodb://localhost:27017/test_database_ci
 
     - name: Wait for backend to be ready
-      run: npx wait-on http://localhost:5000/api/users/login --timeout 60000
+      run: npx wait-on http://localhost:5000/ --timeout 60000
       working-directory: frontend/
 
     - name: Install Playwright browsers
