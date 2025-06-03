@@ -38,7 +38,7 @@ jobs:
       run: npm run dev &
       working-directory: backend/
       env:
-        MONGODB_URI: mongodb://localhost:27017/test_database_ci
+        MONGODB_URI: ${{ secrets.MONGO_URI }}
 
     - name: Wait for backend to be ready
       run: npx wait-on http://localhost:5000/ --timeout 60000
