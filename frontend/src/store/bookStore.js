@@ -1,6 +1,5 @@
 import { create } from "zustand";
 import axios from "axios";
-import mongoose from "mongoose";
 
 const api = axios.create({
   baseURL: "http://localhost:5000/api/books",
@@ -91,9 +90,6 @@ export const bookHandler = create((set, get) => ({
 
   getBookById: async (bookId) => {
     try {
-      if (!mongoose.Types.ObjectId.isValid(bookId)) {
-        throw new Error('ID do livro inválido');
-      }
 
       const response = await api.get(`/${bookId}`);
       
