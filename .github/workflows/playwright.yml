@@ -35,10 +35,10 @@ jobs:
       working-directory: backend/
 
     - name: Start backend server
-      run: npm run dev &
+      run: npm run server.js &
       working-directory: backend/
       env:
-        MONGODB_URI: ${{ secrets.MONGO_URI }}
+        MONGO_URI: ${{ secrets.MONGO_URI }}
 
     - name: Wait for backend to be ready
       run: npx wait-on http://localhost:5000/ --timeout 60000
