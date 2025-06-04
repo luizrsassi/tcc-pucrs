@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-test.describe('Testes de Login', () => {
+test.describe.serial('Testes de Login', () => {
     test.beforeEach(async ({ page }) => {
         await page.goto('/login');
     });
