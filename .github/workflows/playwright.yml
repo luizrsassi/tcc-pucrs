@@ -47,23 +47,35 @@ jobs:
     - name: Run Playwright login test
       run: npx playwright test login.spec.js
       working-directory: frontend/
+      env:
+        MONGO_URI: ${{ secrets.MONGO_URI }}
 
     - name: Run Playwright register test
       run: npx playwright test register.spec.js
       working-directory: frontend/
+      env:
+        MONGO_URI: ${{ secrets.MONGO_URI }}
 
     - name: Run Playwright profile test
       run: npx playwright test profile.spec.js
       working-directory: frontend/
+      env:
+        MONGO_URI: ${{ secrets.MONGO_URI }}
     
     - name: Run Playwright home test
       run: npx playwright test home.spec.js
       working-directory: frontend/
+      env:
+        MONGO_URI: ${{ secrets.MONGO_URI }}
     
     - name: Run Playwright clubs test
       run: npx playwright test clubs.spec.js
       working-directory: frontend/
+      env:
+        MONGO_URI: ${{ secrets.MONGO_URI }}
     
     - name: Run Playwright meets test
       run: npx playwright test meets.spec.js
       working-directory: frontend/
+      env:
+        MONGO_URI: ${{ secrets.MONGO_URI }}
