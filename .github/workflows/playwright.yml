@@ -35,7 +35,7 @@ jobs:
       working-directory: backend/
 
     - name: Start backend server
-      run: npm run server.js &
+      run: npm run dev &
       working-directory: backend/
       env:
         MONGO_URI: ${{ secrets.MONGO_URI }}
