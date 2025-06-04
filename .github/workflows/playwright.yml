@@ -41,7 +41,7 @@ jobs:
         MONGO_URI: ${{ secrets.MONGO_URI }}
 
     - name: Wait for backend to be ready
-      run: npx wait-on http://localhost:5000/ --timeout 60000
+      run: npx wait-on http://localhost:5000/api/users/login --timeout 60000
       working-directory: frontend/
 
     - name: Install Playwright browsers
