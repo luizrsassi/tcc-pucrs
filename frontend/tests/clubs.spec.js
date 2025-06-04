@@ -6,9 +6,10 @@ const __dirname = path.dirname(__filename);
 
 const frontendBaseUrl = 'http://localhost:5173';
 const backendBaseUrl = 'http://localhost:5000';
+let clubName = ''
 
 test.describe.serial('Página de Criação de Clube via Perfil', () => {
-    let clubName = ''
+    
     test.beforeEach(async ({ page, request }) => {
         await page.goto(frontendBaseUrl);
         await page.evaluate(() => localStorage.clear());
@@ -80,16 +81,16 @@ test.describe.serial('Página de Criação de Clube via Perfil', () => {
         await page.getByRole('textbox', { name: 'Regra #' }).fill(rule2);
 
         await page.locator('[data-cy="create-button"]').getByText('Criar Clube').click();
-
-        // await expect(page.getByText('Criar Novo Clube')).not.toBeVisible();
+        await page.waitForLoadState('networkidle');
+        await expect(page.getByText('Criar Novo Clube')).not.toBeVisible();
         await expect(page.getByText('Clube criado com sucesso!')).toBeVisible();
 
         await page.getByRole('button', { name: 'Sair' }).click();
     });
 
     test('3. Deve editar o clube criado anteriormente.', async ({page}) => {
-        
-        await expect(page.locator('div').filter({ hasText: 'Clube de Teste Playwright' }).last()).toBeVisible();
+        await page.waitForLoadState('networkidle');
+        await expect(page.locator('div').filter({ hasText: clubName }).last()).toBeVisible();
         await page.locator('div').filter({ hasText: 'Clube de Teste Playwright' }).last().getByLabel('Editar clube').click();        
         await page.getByRole('textbox', { name: 'Nome do Clube' }).click();
         await page.getByRole('textbox', { name: 'Nome do Clube' }).fill('Clube de Teste Playwright' + Date.now());
@@ -105,7 +106,7 @@ test.describe.serial('Página de Criação de Clube via Perfil', () => {
     });
 
     test('4. Deve deletar o clube com o nome "Clube de Teste Playwright"', async ({page}) => {
-        
+        await page.waitForLoadState('networkidle');
         await expect(page.locator('div').filter({ hasText: 'Clube de Teste Playwright' }).last()).toBeVisible();
         await page.locator('div').filter({ hasText: 'Clube de Teste Playwright' }).last().getByLabel('Excluir clube').click();
         await page.getByRole('button', { name: 'Excluir' }).click();

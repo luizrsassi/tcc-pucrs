@@ -35,32 +35,32 @@ test.describe.serial('Testes de criação e edição de usuários', () => {
         await expect(page.locator('input[name="password"]')).toHaveValue('');
     });
 
-    // test('2. Editar novo usuário', async ({ page }) => {
-    //     await page.goto('/login');
-    //     await page.fill('[data-cy="email-input"]', userEmail);
-    //     await page.fill('[data-cy="password-input"]', userPassword);
-    //     await page.click('button:has-text("Entrar")');
+    test('2. Editar novo usuário', async ({ page }) => {
+        await page.goto('/login');
+        await page.fill('[data-cy="email-input"]', userEmail);
+        await page.fill('[data-cy="password-input"]', userPassword);
+        await page.click('button:has-text("Entrar")');
 
-    //     const successAlert = page.locator('.chakra-alert');
-    //     await expect(successAlert).toContainText('Login realizado com sucesso!');
+        const successAlert = page.locator('.chakra-alert');
+        await expect(successAlert).toContainText('Login realizado com sucesso!');
 
-    //     await expect(page).toHaveURL('/');
+        await expect(page).toHaveURL('/');
         
-    //     await page.goto('/profile');   
-    //     await expect(page).toHaveURL(/.*\/profile/);
-    //     await page.getByRole('textbox', { name: 'Nome completo' }).click();
-    //     await page.getByRole('textbox', { name: 'Nome completo' }).fill(newName);
-    //     await page.getByRole('textbox', { name: 'E-mail' }).click();
-    //     await page.getByRole('textbox', { name: 'E-mail' }).fill(newEmail);
+        await page.goto('/profile');   
+        await expect(page).toHaveURL(/.*\/profile/);
+        await page.getByRole('textbox', { name: 'Nome completo' }).click();
+        await page.getByRole('textbox', { name: 'Nome completo' }).fill(newName);
+        await page.getByRole('textbox', { name: 'E-mail' }).click();
+        await page.getByRole('textbox', { name: 'E-mail' }).fill(newEmail);
 
-    //     await page.getByRole('button', { name: 'Salvar Alterações' }).click();
+        await page.getByRole('button', { name: 'Salvar Alterações' }).click();
         
-    //     const chakraAlertSuccess = page.locator('.chakra-alert');
-    //     await expect(chakraAlertSuccess).toBeVisible();
-    //     await expect(chakraAlertSuccess).toContainText('Perfil atualizado com sucesso!');
+        const chakraAlertSuccess = page.locator('.chakra-alert');
+        await expect(chakraAlertSuccess).toBeVisible();
+        await expect(chakraAlertSuccess).toContainText('Perfil atualizado com sucesso!');
 
-    //     await page.getByRole('button', { name: 'Sair' }).click();
-    // });
+        await page.getByRole('button', { name: 'Sair' }).click();
+    });
 
     test('3. Excluir novo usuário', async ({ page }) => {
 

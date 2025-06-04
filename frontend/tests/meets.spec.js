@@ -56,14 +56,16 @@ test.describe.serial('Página de Criação de Clube via Perfil', () => {
 
         await page.locator('[data-cy="create-button"]').getByText('Criar Clube').click();
 
-        // await expect(page.getByText('Criar Novo Clube')).not.toBeVisible();
-        // await expect(page.getByText('Clube criado com sucesso!')).toBeVisible();
+        await expect(page.getByText('Criar Novo Clube')).not.toBeVisible();
+        await expect(page.getByText('Clube criado com sucesso!')).toBeVisible();
 
-        // await page.getByRole('button', { name: 'Sair' }).click();
+        await page.getByRole('button', { name: 'Sair' }).click();
     });
 
     test('Deve criar um encontro para o clube de teste', async ({page}) => {
         await page.goto(frontendBaseUrl, { waitUntil: 'load' });
+
+        await page.waitForLoadState('networkidle');
 
         await page.getByRole('link', { name: clubName }).click();
         await page.getByRole('button', { name: 'Novo Encontro' }).click();
@@ -135,6 +137,8 @@ test.describe.serial('Página de Criação de Clube via Perfil', () => {
         await page.goto(`${frontendBaseUrl}/profile`);   
         await expect(page).toHaveURL(/.*\/profile/);
         await page.getByRole('tab', { name: 'Clubes' }).click();
+
+        await page.waitForLoadState('networkidle');
 
         await expect(page.locator('div').filter({ hasText: 'Clube de Teste Playwright' }).last()).toBeVisible();
         await page.locator('div').filter({ hasText: 'Clube de Teste Playwright' }).last().getByLabel('Excluir clube').click();

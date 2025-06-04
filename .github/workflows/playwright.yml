@@ -11,12 +11,6 @@ jobs:
     name: Run Playwright Tests
     runs-on: ubuntu-latest
 
-    # services:
-    #   mongodb:
-    #     image: mongo:4.4
-    #     ports:
-    #       - 27017:27017
-
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
@@ -40,14 +34,30 @@ jobs:
       env:
         MONGO_URI: ${{ secrets.MONGO_URI }}
 
-    # - name: Wait for backend to be ready
-    #   run: npx wait-on http://localhost:5000/api/users/login --timeout 60000
-    #   working-directory: frontend/
-
     - name: Install Playwright browsers
       run: npx playwright install --with-deps
       working-directory: frontend/
 
     - name: Run Playwright tests
-      run: npx playwright test frontend/tests
+      run: npx playwright test login.spec.js
+      working-directory: frontend/
+
+    - name: Run Playwright tests
+      run: npx playwright test register.spec.js
+      working-directory: frontend/
+
+    - name: Run Playwright tests
+      run: npx playwright test profile.spec.js
+      working-directory: frontend/
+    
+    - name: Run Playwright tests
+      run: npx playwright test home.spec.js
+      working-directory: frontend/
+    
+    - name: Run Playwright tests
+      run: npx playwright test clubs.spec.js
+      working-directory: frontend/
+    
+    - name: Run Playwright tests
+      run: npx playwright test meets.spec.js
       working-directory: frontend/
