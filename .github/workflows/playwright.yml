@@ -39,6 +39,11 @@ jobs:
       working-directory: backend/
       env:
         MONGO_URI: ${{ secrets.MONGO_URI }}
+    
+    - name: Debug Secret
+      run:
+        echo "DEBUG_SECRET_RAW_PARTIAL=$(echo '${{ secrets.MONGO_URI }}' | head -c 5)"
+        
 
     - name: Install Playwright browsers
       run: npx playwright install --with-deps
