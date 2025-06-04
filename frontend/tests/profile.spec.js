@@ -1,11 +1,17 @@
 import { test, expect } from '@playwright/test';
 
+function getRandomIntInclusive(min, max) {
+  min = Math.ceil(min);
+  max = Math.floor(max); 
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
 test.describe.serial('Testes de criação e edição de usuários', () => {
 
-    const userName = 'Novo Usuário Playwright';
+    const userName = 'Novo Usuário Playwright' + Date.now();
     const newName = 'Nome atualizado'
     const userEmail = `novousuario@usuario.com`;
-    const newEmail = 'mariag1@gmail.com'
+    const newEmail = `mariag${getRandomIntInclusive(1, 100)}1@gmail.com`
     const userPassword = 'SenhaSegura123';
 
     test('1. Criar novo usuário', async ({ page }) => {
