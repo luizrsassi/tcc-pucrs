@@ -1,7 +1,8 @@
 # package*.json
 node_modules
 .env
-uploads/*
+uploads/clubs/*
+uploads/users/*
 
 # playwright
 frontend/playwright-report/
