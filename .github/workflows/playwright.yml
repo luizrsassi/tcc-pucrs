@@ -11,12 +11,6 @@ jobs:
     name: Run Playwright Tests
     runs-on: ubuntu-latest
 
-    services:
-      mongodb:
-        image: mongo:8.0
-        ports:
-          - 27017:27017
-
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
@@ -40,11 +34,6 @@ jobs:
       env:
         MONGO_URI: ${{ secrets.MONGO_URI }}
     
-    - name: Debug Secret
-      run:
-        echo "DEBUG_SECRET_RAW_PARTIAL=$(echo '${{ secrets.MONGO_URI }}' | head -c 5)"
-        
-
     - name: Install Playwright browsers
       run: npx playwright install --with-deps
       working-directory: frontend/
