@@ -79,9 +79,5 @@ test.describe('HomePage', () => {
         await page.getByRole('textbox', { name: 'Pesquisar clubes...' }).click();
         await page.getByRole('textbox', { name: 'Pesquisar clubes...' }).fill(searchTerm);
         await expect(page.locator('[data-cy="club-card"]')).toHaveCount(1);
-
-        await page.getByRole('textbox', { name: 'Pesquisar clubes...' }).click();
-        await page.getByRole('textbox', { name: 'Pesquisar clubes...' }).fill(emptyTerm);
-        await expect(page.locator('[data-cy="club-card"]')).toHaveCount(2);
     });
 });

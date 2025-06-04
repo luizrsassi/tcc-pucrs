@@ -44,10 +44,6 @@ app.use("/uploads/users", express.static(
 
 app.use(express.json());
 
-app.get("/", (req, res) => {
-    res.send("Server is ready123");
-});
-
 app.use("/api/users", userRoutes);
 app.use("/api/clubs", clubRoutes);
 app.use("/api/meet", meetingRoutes);
@@ -57,5 +53,5 @@ app.use("/api/books", bookRoutes);
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
     connectDB();
-    console.log(`Server started at http://localhost:${PORT}`);
+    // console.log(`Server started at http://localhost:${PORT}`);
 });
