@@ -11,6 +11,12 @@ jobs:
     name: Run Playwright Tests
     runs-on: ubuntu-latest
 
+    services:
+      mongodb:
+        image: mongo:8.0
+        ports:
+          - 27017:27017
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v4

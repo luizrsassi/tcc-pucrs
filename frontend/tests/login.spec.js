@@ -38,10 +38,8 @@ test.describe.serial('Testes de Login', () => {
         await page.fill('[data-cy="password-input"]', 'senha123');
         await page.click('button:has-text("Entrar")');
 
-        // const successAlert = page.locator('.chakra-alert');
-        // await expect(successAlert).toContainText('Login realizado com sucesso!');
-
-        await page.waitForLoadState('networkidle');
+        const successAlert = page.locator('.chakra-alert');
+        await expect(successAlert).toContainText('Login realizado com sucesso!');
 
         await expect(page).toHaveURL('/');
     });
