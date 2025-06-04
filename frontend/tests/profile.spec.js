@@ -10,7 +10,7 @@ test.describe.serial('Testes de criação e edição de usuários', () => {
 
     const userName = 'Novo Usuário Playwright' + Date.now();
     const newName = 'Nome atualizado'
-    const userEmail = `novousuario@usuario.com`;
+    const userEmail = `novousuario${getRandomIntInclusive(1, 100)}@usuario.com`;
     const newEmail = `mariag${getRandomIntInclusive(1, 100)}1@gmail.com`
     const userPassword = 'SenhaSegura123';
 
